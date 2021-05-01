@@ -3,7 +3,10 @@ client = discord.Client()
 import os
 import requests
 import json
+from keep_alive import keep_alive
 
+TOKEN = os.environ['TOKEN']
+SERVER = os.environ['SERVER']
 key = 0 # command to be run
 exact_keys = json.load(open('exact_keys.json',))
 #start_keys = json.load(open('start_keys.json',))
@@ -26,6 +29,11 @@ def get_quote():
 
 @client.event
 async def on_ready():
+    for guild in client.guilds:
+        if guild.name != SERVER: continue
+        print(f'{client.user} is connected to {guild.name} (ID: {guild.ID}).')
+        members = '\n - '.join([member.name for member in guild.members])
+        print(f'Guild Members:\n - {members}')
     print(f'{client.user} has connected!')
 
 # main chunk
@@ -60,4 +68,5 @@ async def on_message(message):
     elif key == 4:
         await message.channel.send("there is supposed to be news feeds")
 
-client.run(os.environ['TOKEN'])
+keep_alive()
+client.run(TOKEN)
