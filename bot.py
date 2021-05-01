@@ -39,18 +39,25 @@ async def on_message(message):
         txt = message.content[1:] # message
         key = valid(txt)
         if not key:
-            message.channel.send("Invalid command! Use `.help` to get list of available commands.")
+            message.channel.send("Invalid command! Use `.help` to get a list of available commands.")
+            return
         else:
             txt = txt.strip().split(' ')
     else: return
     
-    if key == 1:
+    if key == 0:
+        await message.channel.send('no help for you haha')
+
+    elif key == 1:
         await message.channel.send('Hello!')
 
     elif key == 2:
         await message.channel.send(get_quote())
     
     elif key == 3:
+        await message.channel.send("there is supposed to be dailies")
+
+    elif key == 4:
         await message.channel.send("there is supposed to be news feeds")
 
 client.run(os.environ['TOKEN'])
