@@ -2,7 +2,8 @@
 My personal discord bot.
 
 **List of features:**
-- nothing
+- say *hello!*
+- nothing else :(
 
 
 
@@ -11,3 +12,4 @@ My personal discord bot.
 - create backup of server
 - read image & scan for text
 - newsfeed from *gnews, reddit etc.*
+- do math
