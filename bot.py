@@ -25,15 +25,17 @@ def valid(message):
 QUOTES = []
 def get_quotes(type): # 'random', 'today'
     if type=="today":
-        response = requests.get("https://zenquotes.io/api/quotes")
+        response = requests.get("https://zenquotes.io/api/today")
         json_tmp = json.loads(response.text)
-        return json_tmp[0]['q'] + " -" + json_tmp[0]['a']
+        quote = json_tmp[0]['q'] + " -" + json_tmp[0]['a']
     else:
         global QUOTES
         if len(QUOTES)==0:
             response = requests.get("https://zenquotes.io/api/quotes")
             QUOTES = json.loads(response.text)
-        return QUOTES[0]['q'] + " -" + QUOTES[0]['a']
+        quote = QUOTES[-1]['q'] + " -" + QUOTES[-1]['a']
+        QUOTES.pop()
+    return quote
 
 
 @client.event
