@@ -1,5 +1,8 @@
 {
-  "help": 0,
+  "help": -1,
+  "raise-exception": -2,
+  "exception": -2,
+  "error": -2,
   "hello": 1,
   "hi": 1,
   "ohayou": 1,

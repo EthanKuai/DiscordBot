@@ -3,8 +3,8 @@ My personal discord bot.
 
 **List of features:**
 - say *hello!*
+- generate quotes
 - nothing else :(
-
 
 
 **List of future features:**
