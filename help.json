@@ -1,0 +1,9 @@
+{
+  ".help": "Displays this message",
+  ".hello .hi .ohayou .bonjour": "Help Pseudo remain happy!",
+  ".inspire .quote .inspiration": "A random quote to stay motivated :)",
+  ".daily": "Your daily quote and news",
+  ".news": "Current news",
+  ".coin .2 <Repeats^>": "Flip a coin!",
+  ".rng .random .dice <Max number> <Repeats^>": "Random number generator."
+}

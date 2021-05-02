@@ -12,7 +12,8 @@ SERVER = os.environ['SERVER']
 key = 0 # command to be run
 exact_keys = json.load(open('exact_keys.json',))
 #start_keys = json.load(open('start_keys.json',))
-MAX_LEN = 100
+help_dict = json.load(open('help.json',))
+MAX_LEN = 1950
 
 
 # validates if message intends to run command
@@ -24,7 +25,15 @@ def valid(message):
     return False
 
 
-# quote feature
+# help command
+def help():
+    message = "**^ represents an optional argument**\n\n"
+    for i, (command, description) in enumerate(help_dict.items()):
+        message += "```" + command + "``` >> " + description + "\n\n"
+    return message
+
+
+# quote command
 QUOTES = []
 def get_quotes(type): # 'random', 'today'
     if type=="today":
@@ -41,7 +50,7 @@ def get_quotes(type): # 'random', 'today'
     return quote
 
 
-# coin feature
+# coin command
 def coin(txt):
     message = ""
     count = 1
@@ -65,7 +74,7 @@ def coin(txt):
     return message
 
 
-# rng feature
+# rng command
 def rng(txt):
     message = ""
     total = 0
@@ -100,14 +109,13 @@ async def on_ready():
     print(f'{client.user} has connected!')
 
 
-"""#handling errors
+#handling errors
 @client.event
 async def on_error(event, *args, **kwargs):
     with open('err.log', 'a') as f:
         if event == 'on_message':
             f.write(f'Unhandled message: {args[0]}\n')
-        else:
-            raise"""
+        else: raise
 
 
 # main chunk
@@ -131,25 +139,18 @@ async def on_message(message):
     # update with future switch feature
     if key == -2: # error
         raise discord.DiscordException
-
     elif key == -1: # help
-        response = "no help for you haha"
-
+        response = help()
     elif key == 1: # hi
         response = "Hello! I am Pseudo, PseudoFlash\'s personal discord bot"
-
     elif key == 2: # quote
         response = get_quotes("random")
-    
     elif key == 3: # daily
         response = get_quotes("today") + "\n there is supposed to be dailies"
-
     elif key == 4: # news
         response = "there is supposed to be news feeds"
-    
     elif key == 5: # coin
         response = coin(txt)
-    
     elif key == 6: #rng
         response = rng(txt)
     
