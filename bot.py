@@ -40,6 +40,57 @@ def get_quotes(type): # 'random', 'today'
     return quote
 
 
+# coin feature
+def coin(txt):
+    message = ""
+    count = 1
+    total = 0
+
+    if len(txt) > 1:
+        return "`.coin` accepts one argument only! (**.coin <Repeats>**)"
+    elif len(txt) == 1:
+        if txt[0].isnumeric():
+            count = max(1, int(txt[0]))
+        else: return "Argument must be a whole number! (**.coin <Repeats>**)"
+
+    for i in range(count):
+        if random.randint(0,1):
+            message += "yes "
+            total += 1
+        else: message += "no "
+    
+    if count > 1:
+        message += "\nTotal sum: **" + str(total) + "**"
+    return message
+
+
+# rng feature
+def rng(txt):
+    message = ""
+    total = 0
+
+    if len(txt) > 2:
+        return "`.rng` accepts two arguments only! (**.rng <Max number> <Repeats>**)"
+    elif len(txt) == 0:
+        return "`.rng` requires at least one argument, with a optional second argument! (**.rng <Max number> <Repeats>**)"
+    else:
+        txt.append("1")
+        if txt[0].isnumeric() and txt[1].isnumeric():
+            maxn = max(0, int(txt[0]))
+            count = max(1, int(txt[1]))
+        else: return "Arguments must be a whole number! (**.rng <Max number> <Repeats>**)"
+
+    for i in range(count):
+        tmp = random.randint(0,maxn)
+        message += str(tmp) + " "
+        total += tmp
+    
+    if count > 1:
+        message += "\nTotal sum: **" + str(total) + "**"
+    return message
+
+
+# startup
 @client.event
 async def on_ready():
     """for guild in client.guilds:
@@ -73,6 +124,7 @@ async def on_message(message):
             return
         else:
             txt = txt.strip().split(' ')[1:]
+            response = ""
     else: return
     
     # update with future switch feature
@@ -80,40 +132,29 @@ async def on_message(message):
         raise discord.DiscordException
 
     elif key == -1: # help
-        await message.channel.send('no help for you haha')
+        response = "no help for you haha"
 
     elif key == 1: # hi
-        await message.channel.send('Hello!')
+        response = "Hello! I am Pseudo, PseudoFlash\'s personal discord bot"
 
     elif key == 2: # quote
+        response = get_quotes("random")
         await message.channel.send(get_quotes("random"))
     
     elif key == 3: # daily
-        await message.channel.send(get_quotes("today"))
-        await message.channel.send("there is supposed to be dailies")
+        response = get_quotes("today") + "\n there is supposed to be dailies"
 
     elif key == 4: # news
-        await message.channel.send("there is supposed to be news feeds")
+        response = "there is supposed to be news feeds"
     
     elif key == 5: # coin
-        message = ""
-        count = 1
-        total = 0
-        if len(txt) > 1:
-            message = "`.coin` accepts one argument only! (No. of coins to flip)"
-        elif len(txt) == 1:
-            s.isnumeric()
-        for i in range(count):
-            if random.randint(0,1):
-                message += "yes"
-                total += 1
-            else: message += "no"
-        if count - 1:
-            message += "\nTotal sum: **" + str(total) + "**"
-        await message.channel.send(message)
+        response = coin(txt)
     
     elif key == 6: #rng
-        await message.channel.send("there is supposed to be news feeds")
+        response = rng(txt)
+    
+    else: return
+    await message.channel.send(response)
 
 
 keep_alive()
