@@ -139,7 +139,6 @@ async def on_message(message):
 
     elif key == 2: # quote
         response = get_quotes("random")
-        await message.channel.send(get_quotes("random"))
     
     elif key == 3: # daily
         response = get_quotes("today") + "\n there is supposed to be dailies"
@@ -153,7 +152,10 @@ async def on_message(message):
     elif key == 6: #rng
         response = rng(txt)
     
-    else: return
+    else:
+        print("how did error 1024 happen?")
+        raise discord.DiscordException
+    
     await message.channel.send(response)
 
 
