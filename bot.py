@@ -12,7 +12,7 @@ SERVER = os.environ['SERVER']
 key = 0 # command to be run
 exact_keys = json.load(open('exact_keys.json',))
 #start_keys = json.load(open('start_keys.json',))
-MAX_LEN = 1900
+MAX_LEN = 100
 
 
 # validates if message intends to run command
@@ -165,7 +165,6 @@ async def on_message(message):
         while i < len(response):
             responses.append(response[i: i + MAX_LEN])
             i += MAX_LEN
-        responses.append(response[i- MAX_LEN:])
     
     for i in responses:
         await message.channel.send(i)
