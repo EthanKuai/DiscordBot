@@ -12,6 +12,7 @@ SERVER = os.environ['SERVER']
 key = 0 # command to be run
 exact_keys = json.load(open('exact_keys.json',))
 #start_keys = json.load(open('start_keys.json',))
+MAX_LEN = 1900
 
 
 # validates if message intends to run command
@@ -153,10 +154,21 @@ async def on_message(message):
         response = rng(txt)
     
     else:
-        print("how did error 1024 happen?")
+        print("how did error 2048 happen?")
         raise discord.DiscordException
     
-    await message.channel.send(response)
+    responses = []
+    if len(response) < MAX_LEN:
+        responses.append(response)
+    else:
+        i = 0
+        while i < len(response):
+            responses.append(response[i: i + MAX_LEN])
+            i += MAX_LEN
+        responses.append(response[i- MAX_LEN:])
+    
+    for i in responses:
+        await message.channel.send(i)
 
 
 keep_alive()
