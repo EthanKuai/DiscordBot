@@ -12,6 +12,11 @@
   "inspiration": 2,
   "daily": 3,
   "news": 4,
-  "others": 5,
-  "others2": 5
+  "coin": 5,
+  "2": 5,
+  "rng": 6,
+  "random": 6,
+  "dice": 6,
+  "others": 10,
+  "others2": 10
 }
