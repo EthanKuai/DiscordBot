@@ -1,20 +1,19 @@
 import discord
-import logging
-from discord.ext import commands
-from keep_alive import keep_alive
 import os
-
 import requests
 import json
+from keep_alive import keep_alive
 import random
 
-MAX_LEN = 1950
+
+client = discord.Client()
 TOKEN = os.environ['TOKEN']
 SERVER = os.environ['SERVER']
-DESC = "Pseudo, a personal discord bot. Currently in development."
-
-bot = commands.Bot(command_prefix = '.', description = DESC)
+key = 0 # command to be run
+exact_keys = json.load(open('exact_keys.json',))
+#start_keys = json.load(open('start_keys.json',))
 help_dict = json.load(open('help.json',))
+MAX_LEN = 1950
 
 
 # validates if message intends to run command
@@ -173,4 +172,4 @@ async def on_message(message):
 
 
 keep_alive()
-bot.run(TOKEN)
+client.run(TOKEN)

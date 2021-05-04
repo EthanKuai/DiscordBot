@@ -4,7 +4,7 @@ My personal discord bot.
 **List of features:**
 - say *hello!*
 - generate quotes
-- flips a coin/rng :)
+- Built in RNG/ precision coin flip machine :)
 - nothing else :(
 
 

@@ -1,3 +1,7 @@
+# depreciated & err log
+err.log
+depreciated/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
