@@ -142,7 +142,7 @@ async def on_message(message):
     elif key == -1: # help
         response = help()
     elif key == 1: # hi
-        response = "Hello! I am Pseudo, PseudoFlash\'s personal discord bot"
+        response = "Hello! I am Pseudo, a personal discord bot"
     elif key == 2: # quote
         response = get_quotes("random")
     elif key == 3: # daily

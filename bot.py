@@ -11,33 +11,24 @@ import random
 MAX_LEN = 1950
 TOKEN = os.environ['TOKEN']
 SERVER = os.environ['SERVER']
-DESC = "Pseudo, a personal discord bot. Currently in development."
+DESC = "Hi I am Pseudo, a personal discord bot. Currently in development."
 
 bot = commands.Bot(command_prefix = '.', description = DESC)
 help_dict = json.load(open('help.json',))
 
 
-# validates if message intends to run command
-def valid(message):
-    tmpkey = message.split(' ', 1)[0].lower()
-    if tmpkey in exact_keys:
-        return exact_keys[tmpkey]
-    #future start_keys method
-    return False
-
-
-# help command
-def help():
+@bot.command()
+async def help(ctx):
     message = "**^ represents an optional argument**\n\n"
     for i, (command, description) in enumerate(help_dict.items()):
         message += "```" + command + "``` >> " + description + "\n\n"
-    return message
+    await ctx.send(message)
 
 
-# quote command
 QUOTES = []
-def get_quotes(type): # 'random', 'today'
-    if type=="today":
+@bot.command()
+def quote(ctx,args):
+    if args=="today":
         response = requests.get("https://zenquotes.io/api/today")
         json_tmp = json.loads(response.text)
         quote = json_tmp[0]['q'] + " -" + json_tmp[0]['a']
@@ -48,20 +39,20 @@ def get_quotes(type): # 'random', 'today'
             QUOTES = json.loads(response.text)
         quote = QUOTES[-1]['q'] + " -" + QUOTES[-1]['a']
         QUOTES.pop()
-    return quote
+    await ctx.send(quote)
 
 
-# coin command
-def coin(txt):
+@bot.command()
+def coin(ctx,args):
     message = ""
     count = 1
     total = 0
 
-    if len(txt) > 1:
+    if len(args) > 1:
         return "`.coin` accepts one argument only! (**.coin <Repeats>**)"
-    elif len(txt) == 1:
-        if txt[0].isnumeric():
-            count = max(1, int(txt[0]))
+    elif len(args) == 1:
+        if args[0].isnumeric():
+            count = max(1, int(args[0]))
         else: return "Argument must be a whole number! (**.coin <Repeats>**)"
 
     for i in range(count):
@@ -72,23 +63,23 @@ def coin(txt):
     
     if count > 1:
         message += "\nTotal sum: **" + str(total) + "**"
-    return message
+    await ctx.send(message)
 
 
-# rng command
-def rng(txt):
+@bot.command()
+def rng(ctx,args):
     message = ""
     total = 0
 
-    if len(txt) > 2:
+    if len(args) > 2:
         return "`.rng` accepts two arguments only! (**.rng <Max number> <Repeats>**)"
-    elif len(txt) == 0:
+    elif len(args) == 0:
         return "`.rng` requires at least one argument, with a optional second argument! (**.rng <Max number> <Repeats>**)"
     else:
-        txt.append("1")
-        if txt[0].isnumeric() and txt[1].isnumeric():
-            maxn = max(0, int(txt[0]))
-            count = max(1, int(txt[1]))
+        args.append("1")
+        if args[0].isnumeric() and args[1].isnumeric():
+            maxn = max(0, int(args[0]))
+            count = max(1, int(args[1]))
         else: return "Arguments must be a whole number! (**.rng <Max number> <Repeats>**)"
 
     for i in range(count):
@@ -98,67 +89,31 @@ def rng(txt):
     
     if count > 1:
         message += "\nTotal sum: **" + str(total) + "**"
-    return message
+    await ctx.send(message)
 
 
-# startup
-@client.event
-async def on_ready():
-    """for guild in client.guilds:
-        if guild.name != SERVER: continue
-        print(f'{client.user} is connected to {guild.name} (ID: {guild.ID}).')"""
-    print(f'{client.user} has connected!')
+@bot.command()
+def error(ctx):
+    raise discord.DiscordException
 
 
-#handling errors
-@client.event
-async def on_error(event, *args, **kwargs):
-    with open('err.log', 'a') as f:
-        if event == 'on_message':
-            f.write(f'Unhandled message: {args[0]}\n')
-        else: raise
+@bot.command()
+def hi(ctx):
+    await ctx.send(DESC)
 
 
-# main chunk
-@client.event
-async def on_message(message):
-    if message.author == client.user:
-        return # bot is not a psycho
-    
-    # validates its a valid command
-    if message.content[0] == ".":   
-        txt = message.content[1:] # message
-        key = valid(txt)
-        if not key:
-            message.channel.send("Invalid command! Use `.help` to get a list of available commands.")
-            return
-        else:
-            txt = txt.strip().split(' ')[1:]
-            response = ""
-    else: return
-    
-    # update with future switch feature
-    if key == -2: # error
-        raise discord.DiscordException
-    elif key == -1: # help
-        response = help()
-    elif key == 1: # hi
-        response = "Hello! I am Pseudo, PseudoFlash\'s personal discord bot"
-    elif key == 2: # quote
-        response = get_quotes("random")
-    elif key == 3: # daily
-        response = get_quotes("today") + "\n there is supposed to be dailies"
-    elif key == 4: # news
-        response = "there is supposed to be news feeds"
-    elif key == 5: # coin
-        response = coin(txt)
-    elif key == 6: #rng
-        response = rng(txt)
-    
-    else:
-        print("how did error 2048 happen?")
-        raise discord.DiscordException
-    
+@bot.command()
+def daily(ctx):
+    quote(ctx,"today")
+    await ctx.send("there is supposed to be dailies.")
+
+
+@bot.command()
+def news(ctx):
+    await ctx.send("there is supposed to be news feeds")
+
+
+def sendMessage(ctx,response):
     responses = []
     if len(response) < MAX_LEN:
         responses.append(response)
@@ -169,7 +124,7 @@ async def on_message(message):
             i += MAX_LEN
     
     for i in responses:
-        await message.channel.send(i)
+        await ctx.send(i)
 
 
 keep_alive()
