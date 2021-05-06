@@ -12,38 +12,38 @@ MAX_LEN = 1950
 TOKEN = os.environ['TOKEN']
 SERVER = os.environ['SERVER']
 DESC = "Hi I am Pseudo, a personal discord bot. Currently in development."
+QUOTES = []
 
 bot = commands.Bot(command_prefix = '.', description = DESC)
 help_dict = json.load(open('help.json',))
 
 
 @bot.command()
-async def help(ctx):
+async def helpp(ctx):
     message = "**^ represents an optional argument**\n\n"
     for i, (command, description) in enumerate(help_dict.items()):
         message += "```" + command + "``` >> " + description + "\n\n"
     await ctx.send(message)
 
 
-QUOTES = []
 @bot.command()
-async def quote(ctx,args):
-    if args=="today":
+async def quote(ctx,*args):
+    if args[0]=="today":
         response = requests.get("https://zenquotes.io/api/today")
         json_tmp = json.loads(response.text)
-        quote = json_tmp[0]['q'] + " -" + json_tmp[0]['a']
+        quote = "**Quote of the day**: *" + json_tmp[0]['q'] + "* -" + json_tmp[0]['a']
     else:
         global QUOTES
         if len(QUOTES)==0:
             response = requests.get("https://zenquotes.io/api/quotes")
             QUOTES = json.loads(response.text)
-        quote = QUOTES[-1]['q'] + " -" + QUOTES[-1]['a']
+        quote = "*" + QUOTES[-1]['q'] + "* -" + QUOTES[-1]['a']
         QUOTES.pop()
     await ctx.send(quote)
 
 
 @bot.command()
-async def coin(ctx,args):
+async def coin(ctx,*args):
     message = ""
     count = 1
     total = 0
@@ -67,7 +67,7 @@ async def coin(ctx,args):
 
 
 @bot.command()
-async def rng(ctx,args):
+async def rng(ctx,*args):
     message = ""
     total = 0
 
@@ -104,7 +104,7 @@ async def hi(ctx):
 
 @bot.command()
 async def daily(ctx):
-    quote(ctx,"today")
+    await quote(ctx,("today"))
     await ctx.send("there is supposed to be dailies.")
 
 
