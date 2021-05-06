@@ -27,7 +27,7 @@ async def help(ctx):
 
 QUOTES = []
 @bot.command()
-def quote(ctx,args):
+async def quote(ctx,args):
     if args=="today":
         response = requests.get("https://zenquotes.io/api/today")
         json_tmp = json.loads(response.text)
@@ -43,7 +43,7 @@ def quote(ctx,args):
 
 
 @bot.command()
-def coin(ctx,args):
+async def coin(ctx,args):
     message = ""
     count = 1
     total = 0
@@ -67,7 +67,7 @@ def coin(ctx,args):
 
 
 @bot.command()
-def rng(ctx,args):
+async def rng(ctx,args):
     message = ""
     total = 0
 
@@ -93,27 +93,27 @@ def rng(ctx,args):
 
 
 @bot.command()
-def error(ctx):
+async def error(ctx):
     raise discord.DiscordException
 
 
 @bot.command()
-def hi(ctx):
+async def hi(ctx):
     await ctx.send(DESC)
 
 
 @bot.command()
-def daily(ctx):
+async def daily(ctx):
     quote(ctx,"today")
     await ctx.send("there is supposed to be dailies.")
 
 
 @bot.command()
-def news(ctx):
+async def news(ctx):
     await ctx.send("there is supposed to be news feeds")
 
 
-def sendMessage(ctx,response):
+async def sendMessage(ctx,response):
     responses = []
     if len(response) < MAX_LEN:
         responses.append(response)
