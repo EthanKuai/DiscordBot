@@ -76,7 +76,7 @@ async def rng(ctx,*args):
     elif len(args) == 0:
         return "`.rng` requires at least one argument, with a optional second argument! (**.rng <Max number> <Repeats>**)"
     else:
-        args.append("1")
+        args = list(args) + ["1"]
         if args[0].isnumeric() and args[1].isnumeric():
             maxn = max(0, int(args[0]))
             count = max(1, int(args[1]))
