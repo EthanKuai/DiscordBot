@@ -1,9 +1,10 @@
 import discord
 import logging
-from discord.ext import commands
+from discord.ext import commands, tasks
 from keep_alive import keep_alive
 import os
 
+import asyncpg
 import requests
 import json
 import random
@@ -72,15 +73,18 @@ async def rng(ctx,*args):
     total = 0
 
     if len(args) > 2:
-        return "`.rng` accepts two arguments only! (**.rng <Max number> <Repeats>**)"
+        await ctx.send("`.rng` accepts two arguments only! (**.rng <Max number> <Repeats>**)")
     elif len(args) == 0:
-        return "`.rng` requires at least one argument, with a optional second argument! (**.rng <Max number> <Repeats>**)"
+        await ctx.send("`.rng` requires at least one argument, with a optional second argument! (**.rng <Max number> <Repeats>**)")
+        return
     else:
         args = list(args) + ["1"]
         if args[0].isnumeric() and args[1].isnumeric():
             maxn = max(0, int(args[0]))
             count = max(1, int(args[1]))
-        else: return "Arguments must be a whole number! (**.rng <Max number> <Repeats>**)"
+        else:
+            await ctx.send("Arguments must be a whole number! (**.rng <Max number> <Repeats>**)")
+            return
 
     for i in range(count):
         tmp = random.randint(0,maxn)
@@ -93,6 +97,7 @@ async def rng(ctx,*args):
 
 
 @bot.command()
+@commands.is_owner()
 async def error(ctx):
     raise discord.DiscordException
 
@@ -113,18 +118,17 @@ async def news(ctx):
     await ctx.send("there is supposed to be news feeds")
 
 
-async def sendMessage(ctx,response):
-    responses = []
-    if len(response) < MAX_LEN:
-        responses.append(response)
-    else:
-        i = 0
-        while i < len(response):
-            responses.append(response[i: i + MAX_LEN])
-            i += MAX_LEN
-    
-    for i in responses:
-        await ctx.send(i)
+@bot.command()
+async def echo(ctx,*,response):
+    response = response.split("\n")
+    for line in response:
+        if len(line) < MAX_LEN:
+            ctx.send(response)
+        else:
+            i = 0
+            while i < len(line):
+                ctx.send(line[i: i + MAX_LEN])
+                i += MAX_LEN
 
 
 keep_alive()
