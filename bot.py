@@ -61,7 +61,7 @@ async def coin(ctx,*args):
             message += "yes "
             total += 1
         else: message += "no "
-    
+
     if count > 1:
         message += "\nTotal sum: **" + str(total) + "**"
     await ctx.send(message)
@@ -90,7 +90,7 @@ async def rng(ctx,*args):
         tmp = random.randint(0,maxn)
         message += str(tmp) + " "
         total += tmp
-    
+
     if count > 1:
         message += "\nTotal sum: **" + str(total) + "**"
     await ctx.send(message)
@@ -130,6 +130,7 @@ async def echo(ctx,*,response):
                 ctx.send(line[i: i + MAX_LEN])
                 i += MAX_LEN
 
+print("test")
 
 keep_alive()
 bot.run(TOKEN)
