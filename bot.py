@@ -19,31 +19,68 @@ bot = commands.Bot(command_prefix = '.', description = DESC)
 help_dict = json.load(open('help.json',))
 
 
+# Raised when wrong input arguments provided
+class argumentError(Error):
+    pass
+
+
+# print command
+async def p(ctx,out):
+    response = response.split("\n")
+    for line in response:
+        if len(line) < MAX_LEN:
+            ctx.send(response)
+        else:
+            i = 0
+            while i < len(line):
+                ctx.send(line[i: i + MAX_LEN])
+                i += MAX_LEN
+
+
+@bot.command()
+async def echo(ctx,*,response):
+    ctx.send(response)
+
+
 @bot.command()
 async def helpp(ctx):
     message = "**^ represents an optional argument**\n\n"
     for i, (command, description) in enumerate(help_dict.items()):
         message += "```" + command + "``` >> " + description + "\n\n"
     #await ctx.send(message)
-    await echo(ctx,message)
+    await p(ctx,message)
+
+
+async def quote_rng(ctx,cnt):
+    global QUOTES
+    if len(QUOTES) < cnt:
+        response = requests.get("https://zenquotes.io/api/quotes")
+        QUOTES += json.loads(response.text)
+
+    for i in range(cnt):
+        quote = "*" + QUOTES[-1]['q'].strip() + "* -" + QUOTES[-1]['a'].strip()
+        QUOTES.pop()
+        await ctx.send(quote)
 
 
 @bot.command()
 async def quote(ctx,*args):
-    if args[0] in ["today","daily"]:
+    if len(args)==0:
+        await quote_rng(ctx,1)
+
+    elif args[0].isnumeric():
+        await quote_rng(ctx,int(args[0]))
+
+    elif args[0] in ["today","daily"]:
         response = requests.get("https://zenquotes.io/api/today")
         json_tmp = json.loads(response.text)
         print(f'json_tmp, daily:{json_tmp}:')
-        quote = "**Quote of the day**: *" + json_tmp[0]['q'].strip() + "* -" + json_tmp[0]['a']
+        quote = "**Quote of the day**: *" + json_tmp[0]['q'].strip() + "* -" + json_tmp[0]['a'].strip()
+        await ctx.send(quote)
+
     else:
-        global QUOTES
-        if len(QUOTES)==0:
-            response = requests.get("https://zenquotes.io/api/quotes")
-            QUOTES = json.loads(response.text)
-        quote = "*" + QUOTES[-1]['q'].strip() + "* -" + QUOTES[-1]['a']
-        QUOTES.pop()
-    #await ctx.send(quote)
-    await echo(ctx,quote)
+        raise argumentError("quote: Wrong arguments.")
+        #WIP
 
 
 @bot.command()
@@ -68,7 +105,7 @@ async def coin(ctx,*args):
     if count > 1:
         message += "\nTotal sum: **" + str(total) + "**"
     #await ctx.send(message)
-    await echo(ctx,message)
+    await p(ctx,message)
 
 
 @bot.command()
@@ -98,7 +135,7 @@ async def rng(ctx,*args):
     if count > 1:
         message += "\nTotal sum: **" + str(total) + "**"
     #await ctx.send(message)
-    await echo(ctx,message)
+    await p(ctx,message)
 
 
 @bot.command()
@@ -110,7 +147,7 @@ async def error(ctx):
 
 @bot.command()
 async def hi(ctx):
-    await echo(ctx,DESC)
+    await p(ctx,DESC)
 
 
 @bot.command()
@@ -123,18 +160,6 @@ async def daily(ctx):
 async def news(ctx):
     await ctx.send("there is supposed to be a news feeds")
 
-
-@bot.command()
-async def echo(ctx,*,response):
-    response = response.split("\n")
-    for line in response:
-        if len(line) < MAX_LEN:
-            ctx.send(response)
-        else:
-            i = 0
-            while i < len(line):
-                ctx.send(line[i: i + MAX_LEN])
-                i += MAX_LEN
 
 print("test")
 
