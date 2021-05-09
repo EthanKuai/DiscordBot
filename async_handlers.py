@@ -2,6 +2,9 @@ import asyncio
 import aiohttp
 import signal
 import json
+import sys
+
+import discord
 
 class handler:
 	def __init__(self):
@@ -43,14 +46,13 @@ class handler:
 			return await response.read()
 
 	async def web_reddit(self, data):
-		j = json.loads(data1.decode('utf-8'))
-		for i in j['data']['children']:
+		message = discord.embed(title='')
+		jdata = json.loads(data.decode('utf-8'))
+		for i in jdata['data']['children']:
 			score = i['data']['score']
 			title = i['data']['title']
 			link = i['data']['url']
-			print(str(score) + ': ' + title + ' (' + link + ')')
-
-		print('DONE:', subreddit + '\n')
+			print(f'web_reddit: score={score}, title={title}, link={link}')
 
 	def signal_handler(self, signal, frame):
 		loop.stop()

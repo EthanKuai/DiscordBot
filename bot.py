@@ -158,6 +158,20 @@ async def daily(ctx):
 @bot.command()
 async def news(ctx):
     await ctx.send("there is supposed to be a news feeds")
+    embed = discord.Embed(title="List of webpages you can open",
+                      description="eg: `{open yt`, then it gives you a link to youtube :>")
+    embed.add_field(name="yt", value="https://www.youtube.com/")
+    embed.add_field(name="reddit", value="https://www.reddit.com/")
+    embed.add_field(name="ph", value="https://www.pornh- just kidding. There's nothing for that :> (or is there... :>)")
+    embed.add_field(name="whatsapp", value="https://web.whatsapp.com/")
+    embed.add_field(name="fb", value="https://www.facebook.com/")
+    embed.add_field(name="stack", value="https://stackoverflow.com/")
+    embed.add_field(name="discordbots", value="https://top.gg/")
+    embed.add_field(name="insta", value="https://www.instagram.com/")
+    embed.add_field(name="twitter", value="https://twitter.com/")
+    embed.add_field(name="pin", value="https://www.pinterest.com/")
+    embed.add_field(name="spotify", value="https://www.spotify.com/my-en/")
+    await ctx.send(embed=embed)
 
 
 print("test")
