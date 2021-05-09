@@ -24,23 +24,26 @@ async def helpp(ctx):
     message = "**^ represents an optional argument**\n\n"
     for i, (command, description) in enumerate(help_dict.items()):
         message += "```" + command + "``` >> " + description + "\n\n"
-    await ctx.send(message)
+    #await ctx.send(message)
+    await echo(ctx,message)
 
 
 @bot.command()
 async def quote(ctx,*args):
-    if args[0]=="today":
+    if args[0] in ["today","daily"]:
         response = requests.get("https://zenquotes.io/api/today")
         json_tmp = json.loads(response.text)
-        quote = "**Quote of the day**: *" + json_tmp[0]['q'] + "* -" + json_tmp[0]['a']
+        print(f'json_tmp, daily:{json_tmp}:')
+        quote = "**Quote of the day**: *" + json_tmp[0]['q'].strip() + "* -" + json_tmp[0]['a']
     else:
         global QUOTES
         if len(QUOTES)==0:
             response = requests.get("https://zenquotes.io/api/quotes")
             QUOTES = json.loads(response.text)
-        quote = "*" + QUOTES[-1]['q'] + "* -" + QUOTES[-1]['a']
+        quote = "*" + QUOTES[-1]['q'].strip() + "* -" + QUOTES[-1]['a']
         QUOTES.pop()
-    await ctx.send(quote)
+    #await ctx.send(quote)
+    await echo(ctx,quote)
 
 
 @bot.command()
@@ -64,7 +67,8 @@ async def coin(ctx,*args):
 
     if count > 1:
         message += "\nTotal sum: **" + str(total) + "**"
-    await ctx.send(message)
+    #await ctx.send(message)
+    await echo(ctx,message)
 
 
 @bot.command()
@@ -93,29 +97,31 @@ async def rng(ctx,*args):
 
     if count > 1:
         message += "\nTotal sum: **" + str(total) + "**"
-    await ctx.send(message)
+    #await ctx.send(message)
+    await echo(ctx,message)
 
 
 @bot.command()
 @commands.is_owner()
 async def error(ctx):
     raise discord.DiscordException
+    await ctx.send("**<Admin>** Error raised.")
 
 
 @bot.command()
 async def hi(ctx):
-    await ctx.send(DESC)
+    await echo(ctx,DESC)
 
 
 @bot.command()
 async def daily(ctx):
     await quote(ctx,("today"))
-    await ctx.send("there is supposed to be dailies.")
+    await ctx.send("There is supposed to be other dailies.")
 
 
 @bot.command()
 async def news(ctx):
-    await ctx.send("there is supposed to be news feeds")
+    await ctx.send("there is supposed to be a news feeds")
 
 
 @bot.command()
