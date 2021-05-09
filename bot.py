@@ -9,6 +9,7 @@ import requests
 import json
 import random
 
+
 MAX_LEN = 1950
 TOKEN = os.environ['TOKEN']
 SERVER = os.environ['SERVER']
@@ -48,12 +49,13 @@ async def helpp(ctx):
 
 async def quote_rng(ctx,cnt):
     global QUOTES
+    cnt = min(cnt,25)
     if len(QUOTES) < cnt:
         response = requests.get("https://zenquotes.io/api/quotes")
         QUOTES += json.loads(response.text)
 
     for i in range(cnt):
-        quote = "*" + QUOTES[-1]['q'].strip() + "* -" + QUOTES[-1]['a'].strip()
+        quote = "*\"" + QUOTES[-1]['q'].strip() + "\"* - **" + QUOTES[-1]['a'].strip() + "**"
         QUOTES.pop()
         await ctx.send(quote)
 
@@ -69,12 +71,11 @@ async def quote(ctx,*args):
     elif args[0] in ["today","daily"]:
         response = requests.get("https://zenquotes.io/api/today")
         json_tmp = json.loads(response.text)
-        print(f'json_tmp, daily:{json_tmp}:')
-        quote = "**Quote of the day**: *" + json_tmp[0]['q'].strip() + "* -" + json_tmp[0]['a'].strip()
-        await ctx.send(quote)
+        quote = "*\"" + json_tmp[0]['q'].strip() + "\"* - **" + json_tmp[0]['a'].strip() + "**"
+        await ctx.send("**Quote of the day**: " + quote)
 
     else:
-        await ctx.send("quote: Wrong arguments.")
+        await ctx.send("`.quote` Wrong arguments.")
         #WIP
 
 
