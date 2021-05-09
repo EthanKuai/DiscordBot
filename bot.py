@@ -21,7 +21,7 @@ help_dict = json.load(open('help.json',))
 
 # print command
 async def p(ctx,out):
-    response = response.split("\n")
+    response = out.split("\n")
     for line in response:
         if len(line) < MAX_LEN:
             ctx.send(response)
