@@ -18,8 +18,8 @@ TOKEN = os.environ['TOKEN']
 SERVER = os.environ['SERVER']
 DESC = "Hi I am Pseudo, a personal discord bot. Currently in development."
 QUOTES = []
-LINK_CNT = os.environ['LINK_CNT']
-LINKS = getlinks(LINK_CNT)
+LINK_CNT = int(os.environ['LINK_CNT'])
+LINKS = get_links()
 
 bot = commands.Bot(command_prefix = '.', description = DESC)
 help_dict = json.load(open('help.json',))
@@ -27,7 +27,8 @@ loop = asyncio.get_event_loop()
 httpclient = aiohttp.ClientSession(loop=loop)
 
 
-def getlinks(LINK_CNT):
+def get_links():
+    global LINK_CNT
     LINKS = []
     try:
         for i in range(LINK_CNT):
@@ -36,6 +37,47 @@ def getlinks(LINK_CNT):
     except:
         print("Failed to get LINKS")
         exit()
+
+
+def write_links(link):
+    global LINK_CNT
+    try:
+        os.environ['LINK'+str(LINK_CNT)] = link
+        LINK_CNT += 1
+        os.environ['LINK_CNT'] = str(LINK_CNT)
+        print("write_links: Successfully wrote new link")
+        return True
+    except:
+        print("write_links: Failed to write link to environmental variables")
+        return False
+
+
+async def get_json(client, url):
+    async with client.get(url) as response:
+        assert response.status == 200
+        return await response.read()
+
+async def get_reddit_top(subreddit, client):
+    data1 = await get_json(client, 'https://www.reddit.com/r/' + subreddit + '/top.json?sort=top&t=day&limit=5')
+
+    j = json.loads(data1.decode('utf-8'))
+    for i in j['data']['children']:
+        score = i['data']['score']
+        title = i['data']['title']
+        link = i['data']['url']
+        print(str(score) + ': ' + title + ' (' + link + ')')
+
+    print('DONE:', subreddit + '\n')
+
+def signal_handler(signal, frame):
+    loop.stop()
+    client.close()
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
+
+asyncio.ensure_future(get_reddit_top('worldnews', httpclient))
+loop.run_forever()
 
 
 # print command
