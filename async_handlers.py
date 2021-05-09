@@ -11,9 +11,9 @@ class handler:
 		self.loop = asyncio.get_event_loop()
 		self.client = aiohttp.ClientSession(loop=self.loop)
 		self.LINK_CNT = int(os.environ['LINK_CNT'])
-		get_links()
+		self.get_links()
 
-	def get_links():
+	def get_links(self):
 		self.LINKS = []
 		try:
 			for i in range(self.LINK_CNT):
@@ -22,7 +22,7 @@ class handler:
 			print("Failed to get links")
 			exit()
 
-	def write_links(link):
+	def write_links(self, link):
 		LINKS.append(link)
 		try:
 			os.environ['LINK'+str(self.LINK_CNT)] = link
