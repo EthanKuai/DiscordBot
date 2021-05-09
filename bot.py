@@ -19,6 +19,11 @@ bot = commands.Bot(command_prefix = '.', description = DESC)
 help_dict = json.load(open('help.json',))
 
 
+class Error(Exception):
+    """Base class for other exceptions"""
+    pass
+
+
 # Raised when wrong input arguments provided
 class argumentError(Error):
     pass
