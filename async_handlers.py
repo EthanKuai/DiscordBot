@@ -2,7 +2,7 @@ import asyncio
 import aiohttp
 import signal
 import json
-import sys
+import os
 
 import discord
 
