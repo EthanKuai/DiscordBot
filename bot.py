@@ -3,11 +3,14 @@ import logging
 from discord.ext import commands, tasks
 from keep_alive import keep_alive
 import os
+import asyncio
 
 import asyncpg
 import requests
 import json
 import random
+import aiohttp
+import signal
 
 
 MAX_LEN = 1950
@@ -15,9 +18,24 @@ TOKEN = os.environ['TOKEN']
 SERVER = os.environ['SERVER']
 DESC = "Hi I am Pseudo, a personal discord bot. Currently in development."
 QUOTES = []
+LINK_CNT = os.environ['LINK_CNT']
+LINKS = getlinks(LINK_CNT)
 
 bot = commands.Bot(command_prefix = '.', description = DESC)
 help_dict = json.load(open('help.json',))
+loop = asyncio.get_event_loop()
+httpclient = aiohttp.ClientSession(loop=loop)
+
+
+def getlinks(LINK_CNT):
+    LINKS = []
+    try:
+        for i in range(LINK_CNT):
+            LINKS.append(os.environ['LINK'+str(i)])
+        return LINKS
+    except:
+        print("Failed to get LINKS")
+        exit()
 
 
 # print command
@@ -68,7 +86,7 @@ async def quote(ctx,*args):
     elif args[0].isnumeric():
         await quote_rng(ctx,int(args[0]))
 
-    elif args[0] in ["today","daily"]:
+    elif args[0].lower() in ["today","daily","qotd"]:
         response = requests.get("https://zenquotes.io/api/today")
         json_tmp = json.loads(response.text)
         quote = "*\"" + json_tmp[0]['q'].strip() + "\"* - **" + json_tmp[0]['a'].strip() + "**"
