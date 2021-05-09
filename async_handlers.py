@@ -54,12 +54,5 @@ class handler:
 			link = i['data']['url']
 			print(f'web_reddit: score={score}, title={title}, link={link}')
 
-	def signal_handler(self, signal, frame):
-		loop.stop()
-		client.close()
-		sys.exit(0)
-
-signal.signal(signal.SIGINT, signal_handler)
-
 asyncio.ensure_future(get_reddit_top('worldnews', client))
 loop.run_forever()
