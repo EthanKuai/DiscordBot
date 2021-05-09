@@ -34,7 +34,11 @@ class handler:
 			print("write_links: Failed to write link to environmental variables")
 			return False
 
-	async def read_link(self):
+	def daily(self):
+		asyncio.ensure_future(self.read_links())
+		self.loop.run_forever()
+
+	async def read_links(self):
 		for link in self.LINKS:
 			data = await web_json(link)
 			if link.startswith("https://www.reddit.com"): await web_reddit(data)
@@ -53,6 +57,3 @@ class handler:
 			title = i['data']['title']
 			link = i['data']['url']
 			print(f'web_reddit: score={score}, title={title}, link={link}')
-
-asyncio.ensure_future(get_reddit_top('worldnews', client))
-loop.run_forever()
