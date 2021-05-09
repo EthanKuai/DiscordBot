@@ -19,16 +19,6 @@ bot = commands.Bot(command_prefix = '.', description = DESC)
 help_dict = json.load(open('help.json',))
 
 
-class Error(Exception):
-    """Base class for other exceptions"""
-    pass
-
-
-# Raised when wrong input arguments provided
-class argumentError(Error):
-    pass
-
-
 # print command
 async def p(ctx,out):
     response = response.split("\n")
@@ -84,7 +74,7 @@ async def quote(ctx,*args):
         await ctx.send(quote)
 
     else:
-        raise argumentError("quote: Wrong arguments.")
+        await ctx.send("quote: Wrong arguments.")
         #WIP
 
 
