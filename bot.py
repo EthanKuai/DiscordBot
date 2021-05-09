@@ -24,11 +24,11 @@ async def p(ctx,out):
     response = out.split("\n")
     for line in response:
         if len(line) < MAX_LEN:
-            ctx.send(response)
+            await ctx.send(response)
         else:
             i = 0
             while i < len(line):
-                ctx.send(line[i: i + MAX_LEN])
+                await ctx.send(line[i: i + MAX_LEN])
                 i += MAX_LEN
 
 
