@@ -9,7 +9,7 @@ import discord
 class handler:
 	def __init__(self):
 		self.loop = asyncio.get_event_loop()
-		self.client = aiohttp.ClientSession(loop=loop)
+		self.client = aiohttp.ClientSession(loop=self.loop)
 		self.LINK_CNT = int(os.environ['LINK_CNT'])
 		get_links()
 
