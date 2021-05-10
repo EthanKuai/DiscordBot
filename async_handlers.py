@@ -8,6 +8,7 @@ import discord
 
 class handler:
 	def __init__(self):
+		self.MAX_CHAR = 200
 		self.loop = asyncio.get_event_loop()
 		self.client = aiohttp.ClientSession(loop=self.loop)
 		self.LINK_CNT = int(os.environ['LINK_CNT'])
@@ -39,10 +40,12 @@ class handler:
 		self.loop.run_forever()
 
 	async def read_links(self):
+		messages = []
 		for link in self.LINKS:
 			data = await web_json(link)
-			if link.startswith("https://www.reddit.com"): await web_reddit(data)
-			else: print(f'read_link: link {link} does not math any known APIs!')
+			if link.startswith("https://www.reddit.com"): messages.append(await web_reddit(data))
+			else: print(f'handler.read_link: link "{link}" does not match any known APIs!')
+		return messages
 
 	async def web_json(self, url):
 		async with self.client.get(url) as response:
@@ -61,9 +64,7 @@ class handler:
 			link = i['data']['url'].strip()
 			score = i['data']['score'].strip()
 
-			if len(desc) > 200: desc = desc[:197]+"..."
+			if len(desc) > MAX_CHAR: desc = desc[:MAX_CHAR-3]+"..."
 			embed.add_field(name=f'[{title}]({link})', value=desc, inline=False)
 			print(f'web_reddit: score={score}, title={title}, link={link}')
-
-		message.add_field(title="Top of today: {subreddit}")
     	return message
