@@ -110,7 +110,7 @@ async def rng(ctx, maxn: int, cnt: typing.Optional[int] = 1):
     message = ""
     total = 0
     cnt = min(1, cnt)
-    maxn = min(1, maxn)
+    maxn = max(1, maxn)
 
     for i in range(cnt):
         tmp = random.randint(0,maxn)
