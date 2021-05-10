@@ -109,7 +109,7 @@ async def coin(ctx, cnt: typing.Optional[int] = 1):
 async def rng(ctx, maxn: int, cnt: typing.Optional[int] = 1):
     message = ""
     total = 0
-    cnt = min(1, cnt)
+    cnt = max(1, cnt)
     maxn = max(1, maxn)
 
     for i in range(cnt):
