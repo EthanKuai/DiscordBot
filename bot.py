@@ -87,6 +87,7 @@ async def quote(ctx,*args):
 async def coin(ctx, cnt: typing.Optional[int] = 1):
     message = ""
     total = 0
+    cnt = min(cnt,MAX_LEN)
 
     if cnt < 100:
         yes = "yes "
@@ -109,7 +110,7 @@ async def coin(ctx, cnt: typing.Optional[int] = 1):
 async def rng(ctx, maxn: int, cnt: typing.Optional[int] = 1):
     message = ""
     total = 0
-    cnt = max(1, cnt)
+    cnt = min(max(1, cnt),MAX_LEN)
     maxn = max(1, maxn)
 
     for i in range(cnt):
