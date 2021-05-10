@@ -19,6 +19,7 @@ TOKEN = os.environ['TOKEN']
 SERVER = os.environ['SERVER']
 DESC = "Hi I am Pseudo, a personal discord bot. Currently in development."
 QUOTES = []
+QUOTE_DAILY = ["today","daily","qotd"]
 
 bot = commands.Bot(command_prefix = '.', description = DESC)
 help_dict = json.load(open('help.json',))
@@ -52,36 +53,24 @@ async def helpp(ctx):
     await p(ctx,message)
 
 
-async def quote_rng(ctx,cnt):
-    global QUOTES
-    cnt = min(cnt,25)
-    if len(QUOTES) < cnt:
-        response = requests.get("https://zenquotes.io/api/quotes")
-        QUOTES += json.loads(response.text)
-
-    for i in range(cnt):
-        quote = "*\"" + QUOTES[-1]['q'].strip() + "\"* - **" + QUOTES[-1]['a'].strip() + "**"
-        QUOTES.pop()
-        await ctx.send(quote)
-
-
 @bot.command()
-async def quote(ctx, *args):
-    if len(args)==0:
-        await quote_rng(ctx,1)
-
-    elif args[0].isnumeric():
-        await quote_rng(ctx,int(args[0]))
-
-    elif args[0].lower() in ["today","daily","qotd"]:
+async def quote(ctx, cnt: text_or_int(-1, QUOTE_DAILY)):
+    if cnt==-1: # daily quote
         response = requests.get("https://zenquotes.io/api/today")
         json_tmp = json.loads(response.text)
         quote = "*\"" + json_tmp[0]['q'].strip() + "\"* - **" + json_tmp[0]['a'].strip() + "**"
         await ctx.send("**Quote of the day**: " + quote)
+    else: # normal quote
+        global QUOTES
+        cnt = min(cnt,25)
+        if len(QUOTES) < cnt:
+            response = requests.get("https://zenquotes.io/api/quotes")
+            QUOTES += json.loads(response.text)
 
-    else:
-        await ctx.send("`.quote` Wrong arguments.")
-        #WIP
+        for i in range(cnt):
+            quote = "*\"" + QUOTES[-1]['q'].strip() + "\"* - **" + QUOTES[-1]['a'].strip() + "**"
+            QUOTES.pop()
+            await ctx.send(quote)
 
 
 @bot.command()

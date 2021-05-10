@@ -7,7 +7,8 @@ class text_or_int(commands.Converter):
 		self.lst_text = lst_text # list of accepted text
 
     async def convert(self, ctx, arg):
+		arg = arg.lower()
 		if arg=="": return 1
 		elif arg.isnumeric(): return int(arg)
 		elif arg in lst_text: return self.textout
-		else: raise CommandError("Not integer nor recognised text")
+		else: raise CommandError(f"Neither integer nor recognised text: <{arg}>")
