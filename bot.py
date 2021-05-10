@@ -142,8 +142,8 @@ async def daily(ctx):
 
 
 @bot.command()
-async def ping(ctx):
-    await ctx.send('Pong! Latency: {0}'.format(round(bot.latency, 2)))
+async def ping(ctx, precision: typing.Optional[int] = 3):
+    await ctx.send('Pong! Latency: {0}'.format(round(bot.latency, precision)))
 
 
 @bot.command()
@@ -155,8 +155,6 @@ async def news(ctx):
     embed.add_field(name="yt", value="[link](https://www.youtube.com/)", inline=False)
     await ctx.send(embed=embed)
 
-
-print("test")
 
 keep_alive()
 bot.run(TOKEN)

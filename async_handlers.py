@@ -50,10 +50,20 @@ class handler:
 			return await response.read()
 
 	async def web_reddit(self, data):
-		message = discord.embed(title='')
-		jdata = json.loads(data.decode('utf-8'))
-		for i in jdata['data']['children']:
-			score = i['data']['score']
-			title = i['data']['title']
-			link = i['data']['url']
+		jdata = json.loads(data.decode('utf-8'))['data']['children']
+		subreddit = jdata[0]['data']['subreddit_name_prefixed']
+		message = discord.embed(title="Reddit's top today: {subreddit}",\
+			colour=discord.Colour(0x3e038c))
+
+		for i in jdata:
+			title = "**"+i['data']['title'].strip()+"**"
+			desc = i['data']['selftext'].strip()
+			link = i['data']['url'].strip()
+			score = i['data']['score'].strip()
+
+			if len(desc) > 200: desc = desc[:197]+"..."
+			embed.add_field(name=f'[{title}]({link})', value=desc, inline=False)
 			print(f'web_reddit: score={score}, title={title}, link={link}')
+
+		message.add_field(title="Top of today: {subreddit}")
+    	return message
