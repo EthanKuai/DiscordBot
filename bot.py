@@ -29,7 +29,7 @@ async def p(ctx,out):
     response = out.split("\n")
     for line in response:
         if len(line) < MAX_LEN:
-            await ctx.send(response)
+            await ctx.send(line)
         else:
             i = 0
             while i < len(line):
@@ -39,7 +39,7 @@ async def p(ctx,out):
 
 @bot.command()
 async def echo(ctx,*,response):
-    ctx.send(response)
+    await ctx.send(response)
 
 
 @bot.command()
@@ -101,7 +101,7 @@ async def coin(ctx, cnt: typing.Optional[int] = 1):
             total += 1
         else: message += no
 
-    if count > 1: message += "\nTotal sum: **" + str(total) + "**"
+    if cnt > 1: message += "\nTotal sum: **" + str(total) + "**"
     await p(ctx,message)
 
 
