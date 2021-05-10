@@ -54,7 +54,7 @@ async def helpp(ctx):
 
 
 @bot.command()
-async def quote(ctx, cnt: text_or_int(-1, QUOTE_DAILY)):
+async def quote(ctx, cnt: text_or_int(-1, QUOTE_DAILY) = 1):
     if cnt==-1: # daily quote
         response = requests.get("https://zenquotes.io/api/today")
         json_tmp = json.loads(response.text)
