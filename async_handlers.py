@@ -1,6 +1,5 @@
 import asyncio
 import aiohttp
-import signal
 import json
 import os
 
@@ -24,7 +23,7 @@ class handler:
 			exit()
 
 	def write_links(self, link):
-		LINKS.append(link)
+		self.LINKS.append(link)
 		try:
 			os.environ['LINK'+str(self.LINK_CNT)] = link
 			self.LINK_CNT += 1
@@ -42,8 +41,8 @@ class handler:
 	async def read_links(self):
 		messages = []
 		for link in self.LINKS:
-			data = await web_json(link)
-			if link.startswith("https://www.reddit.com"): messages.append(await web_reddit(data))
+			data = await self.web_json(link)
+			if link.startswith("https://www.reddit.com"): messages.append(await self.web_reddit(data))
 			else: print(f'handler.read_link: link "{link}" does not match any known APIs!')
 		return messages
 
@@ -55,8 +54,7 @@ class handler:
 	async def web_reddit(self, data):
 		jdata = json.loads(data.decode('utf-8'))['data']['children']
 		subreddit = jdata[0]['data']['subreddit_name_prefixed']
-		message = discord.embed(title="Reddit's top today: {subreddit}",\
-			colour=discord.Colour(0x3e038c))
+		message = discord.embed(title=f"Reddit's top today: {subreddit}", colour=discord.Colour(0x3e038c))
 
 		for i in jdata:
 			title = "**"+i['data']['title'].strip()+"**"
@@ -64,7 +62,7 @@ class handler:
 			link = i['data']['url'].strip()
 			score = i['data']['score'].strip()
 
-			if len(desc) > MAX_CHAR: desc = desc[:MAX_CHAR-3]+"..."
-			embed.add_field(name=f'[{title}]({link})', value=desc, inline=False)
+			if len(desc) > self.MAX_CHAR: desc = desc[:self.MAX_CHAR-3]+"..."
+			message.add_field(name=f'[{title}]({link})', value=desc, inline=False)
 			print(f'web_reddit: score={score}, title={title}, link={link}')
-    	return message
+		return message
