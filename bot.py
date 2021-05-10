@@ -10,6 +10,7 @@ import asyncpg
 import requests
 import json
 import random
+import typing
 
 
 MAX_LEN = 1950
