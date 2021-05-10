@@ -83,57 +83,41 @@ async def quote(ctx,*args):
 
 
 @bot.command()
-async def coin(ctx,*args):
+async def coin(ctx, cnt: typing.Optional[int] = 1):
     message = ""
-    count = 1
     total = 0
 
-    if len(args) > 1:
-        return "`.coin` accepts one argument only! (**.coin <Repeats>**)"
-    elif len(args) == 1:
-        if args[0].isnumeric():
-            count = max(1, int(args[0]))
-        else: return "Argument must be a whole number! (**.coin <Repeats>**)"
+    if cnt < 100:
+        yes = "yes "
+        no = "no "
+    else:
+        yes = "1 "
+        no = "0 "
 
-    for i in range(count):
+    for i in range(cnt):
         if random.randint(0,1):
-            message += "yes "
+            message += yes
             total += 1
-        else: message += "no "
+        else: message += no
 
-    if count > 1:
-        message += "\nTotal sum: **" + str(total) + "**"
-    #await ctx.send(message)
+    if count > 1: message += "\nTotal sum: **" + str(total) + "**"
     await p(ctx,message)
 
 
 @bot.command()
-async def rng(ctx,*args):
+async def rng(ctx, maxn: int, cnt: typing.Optional[int] = 1):
     message = ""
     total = 0
+    cnt = min(1, cnt)
+    maxn = min(1, maxn)
 
-    if len(args) > 2:
-        await ctx.send("`.rng` accepts two arguments only! (**.rng <Max number> <Repeats>**)")
-    elif len(args) == 0:
-        await ctx.send("`.rng` requires at least one argument, with a optional second argument! (**.rng <Max number> <Repeats>**)")
-        return
-    else:
-        args = list(args) + ["1"]
-        if args[0].isnumeric() and args[1].isnumeric():
-            maxn = max(0, int(args[0]))
-            count = max(1, int(args[1]))
-        else:
-            await ctx.send("Arguments must be a whole number! (**.rng <Max number> <Repeats>**)")
-            return
-
-    for i in range(count):
+    for i in range(cnt):
         tmp = random.randint(0,maxn)
         message += str(tmp) + " "
         total += tmp
 
-    if count > 1:
+    if cnt > 1:
         message += "\nTotal sum: **" + str(total) + "**"
-    #await ctx.send(message)
     await p(ctx,message)
 
 
@@ -156,21 +140,17 @@ async def daily(ctx):
 
 
 @bot.command()
+async def ping(ctx):
+    await ctx.send('Pong! Latency: {0}'.format(round(bot.latency, 2)))
+
+
+@bot.command()
 async def news(ctx):
     await ctx.send("there is supposed to be a news feeds")
     embed = discord.Embed(title="List of webpages you can open",
-                      description="eg: `{open yt`, then it gives you a link to youtube :>")
-    embed.add_field(name="yt", value="https://www.youtube.com/")
-    embed.add_field(name="reddit", value="https://www.reddit.com/")
-    embed.add_field(name="ph", value="https://www.pornh- just kidding. There's nothing for that :> (or is there... :>)")
-    embed.add_field(name="whatsapp", value="https://web.whatsapp.com/")
-    embed.add_field(name="fb", value="https://www.facebook.com/")
-    embed.add_field(name="stack", value="https://stackoverflow.com/")
-    embed.add_field(name="discordbots", value="https://top.gg/")
-    embed.add_field(name="insta", value="https://www.instagram.com/")
-    embed.add_field(name="twitter", value="https://twitter.com/")
-    embed.add_field(name="pin", value="https://www.pinterest.com/")
-    embed.add_field(name="spotify", value="https://www.spotify.com/my-en/")
+                      description="eg: some descriton",
+                      colour=discord.Colour(0x3e038c))
+    embed.add_field(name="yt", value="[link](https://www.youtube.com/)", inline=False)
     await ctx.send(embed=embed)
 
 
