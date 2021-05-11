@@ -1,19 +1,24 @@
+import discord
+from discord.ext import commands, tasks
+
+
+import asyncpg
 import asyncio
 import aiohttp
 import json
 import os
+import datetime
 
-import discord
 
-class handler:
+class web_crawler:
 	def __init__(self):
 		self.MAX_CHAR = 200
 		self.loop = asyncio.get_event_loop()
 		self.client = aiohttp.ClientSession(loop=self.loop)
 		self.LINK_CNT = int(os.environ['LINK_CNT'])
-		self.get_links()
+		self.read_links()
 
-	def get_links(self):
+	def read_links(self):
 		self.LINKS = []
 		try:
 			for i in range(self.LINK_CNT):
@@ -34,11 +39,7 @@ class handler:
 			print("write_links: Failed to write link to environmental variables")
 			return False
 
-	def daily(self):
-		asyncio.ensure_future(self.read_links())
-		self.loop.run_forever()
-
-	async def read_links(self):
+	async def view_links(self):
 		messages = []
 		for link in self.LINKS:
 			data = await self.web_json(link)
@@ -66,3 +67,27 @@ class handler:
 			message.add_field(name=f'[{title}]({link})', value=desc, inline=False)
 			print(f'web_reddit: score={score}, title={title}, link={link}')
 		return message
+
+
+class MyCog(commands.Cog):
+	def __init__(self, bot, web_bot: web_crawler):
+		self.bot = bot
+		self.web_bot = web_bot
+		self.daily_briefing.add_exception_type(asyncpg.PostgresConnectionError)
+		self.daily_briefing.start()
+
+	def cog_unload(self):
+		self.daily_briefing.cancel()
+
+	@tasks.loop(hours=24.0)
+	async def daily_briefing(self):
+		#loop.run_until_complete(asyncio.gather(self.view_links_async()))
+		messages = await self.web_bot.view_links()
+		#do sth
+		pass
+
+	@daily.after_loop
+	async def daily_briefing_cancel(self):
+		if self.daily_briefing.is_being_cancelled():
+			#do sth
+			pass

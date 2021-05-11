@@ -1,8 +1,9 @@
-# depreciated & err log
+# stuff to ignore
 err.log
 depreciated/
 poetry.lock
 pyproject.toml
+discordpy documentation.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

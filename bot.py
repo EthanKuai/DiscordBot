@@ -1,14 +1,12 @@
 import discord
 import logging
-from discord.ext import commands, tasks
+from discord.ext import commands
 from keep_alive import keep_alive
 import os
-import asyncio
 
 from async_handlers import *
 from converters import *
-from errorhandlers import *
-import asyncpg
+import asyncio
 import requests
 import json
 import random
@@ -24,7 +22,8 @@ QUOTE_DAILY = ["today","daily","qotd"]
 
 bot = commands.Bot(command_prefix = '.', description = DESC)
 help_dict = json.load(open('help.json',))
-async_handler = handler()
+web_bot = web_crawler()
+my_cog = MyCog()
 
 
 # print command
