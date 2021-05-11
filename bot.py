@@ -7,6 +7,7 @@ import asyncio
 
 from async_handlers import *
 from converters import *
+from errorhandlers import *
 import asyncpg
 import requests
 import json
@@ -116,8 +117,8 @@ async def rng(ctx, maxn: int, cnt: typing.Optional[int] = 1):
 @bot.command()
 @commands.is_owner()
 async def error(ctx):
-    raise discord.DiscordException
     await ctx.send("**<Admin>** Error raised.")
+    raise discord.DiscordException
 
 
 @bot.command()
