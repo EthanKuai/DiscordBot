@@ -83,8 +83,7 @@ class MyCog(commands.Cog):
 	async def daily_briefing(self):
 		#loop.run_until_complete(asyncio.gather(self.view_links_async()))
 		messages = await self.web_bot.view_links()
-		#do sth
-		pass
+		await self.bot.get_guild("").get_channel("").send("Test")
 
 	@daily.after_loop
 	async def daily_briefing_cancel(self):

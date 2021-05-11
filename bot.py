@@ -23,7 +23,7 @@ QUOTE_DAILY = ["today","daily","qotd"]
 bot = commands.Bot(command_prefix = '.', description = DESC)
 help_dict = json.load(open('help.json',))
 web_bot = web_crawler()
-my_cog = MyCog()
+my_cog = MyCog(bot, web_bot)
 
 
 # print command
@@ -40,8 +40,9 @@ async def p(ctx,out):
 
 
 @bot.command()
-async def echo(ctx,*,response):
-    await ctx.send(response)
+async def echo(ctx,cnt: typing.Optional[int] = 1,*,response):
+    for i in range(max(cnt,10)):
+        await ctx.send(response)
 
 
 @bot.command()
@@ -124,6 +125,17 @@ async def rng(ctx, maxn: int, cnt: typing.Optional[int] = 1):
 async def error(ctx):
     await ctx.send("**<Admin>** Error raised.")
     raise discord.DiscordException
+
+
+@bot.command()
+@commands.is_owner()
+async def info(ctx):
+    try:
+        await ctx.send("**<Admin>** Channel information.")
+        await ctx.send(f'guild:{ctx.guild}, channel:{ctx.channel}')
+        await ctx.send(ctx)
+    except:
+        error(ctx)
 
 
 @bot.command()
