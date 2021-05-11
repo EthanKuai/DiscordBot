@@ -15,8 +15,8 @@ import typing
 
 MAX_LEN = 1950
 TOKEN = os.environ['TOKEN']
-GUILDID = os.environ['GUILD_ID']
-CHANNELID = os.environ['CHANNEL_ID']
+GUILDID = int(os.environ['GUILD_ID'])
+CHANNELID = int(os.environ['CHANNEL_ID'])
 DESC = "Hi I am Pseudo, a personal discord bot. Currently in development."
 QUOTES = []
 QUOTE_DAILY = ["today","daily","qotd"]
