@@ -1,0 +1,14 @@
+https://discordpy.readthedocs.io/en/latest/ext/commands/commands.html#discord-converters
+typing.Union[discord.TextChannel, discord.Member]
+typing.Optional[int]
+commands.Greedy[discord.Member]
+Member, User, Message, PartialMessage, TextChannel, VoiceChannel, StageChannel, StoreChannel, CategoryChannel, Invite, Guild, Role, Game, Color, Emoji, PartialEmoji
+
+errors
+raise BadArgument('Converting to "{}" failed for parameter "{}".'.format(name, param.name)) from exc
+discord.ext.commands.errors.BadArgument: Converting to "int" failed for parameter "maxn".
+Ignoring exception in command None:
+discord.ext.commands.errors.CommandNotFound: Command "eng" is not found
+
+embed mesages etc.
+[word](link)

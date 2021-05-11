@@ -54,7 +54,7 @@ class handler:
 	async def web_reddit(self, data):
 		jdata = json.loads(data.decode('utf-8'))['data']['children']
 		subreddit = jdata[0]['data']['subreddit_name_prefixed']
-		message = discord.embed(title=f"Reddit's top today: {subreddit}", colour=discord.Colour(0x3e038c))
+		message = discord.Embed(title=f"Reddit's top today: {subreddit}", colour=discord.Colour(0x3e038c))
 
 		for i in jdata:
 			title = "**"+i['data']['title'].strip()+"**"
