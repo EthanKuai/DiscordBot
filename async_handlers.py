@@ -61,7 +61,7 @@ class web_crawler:
 			title = "**"+i['data']['title'].strip()+"**"
 			desc = i['data']['selftext'].strip()
 			link = i['data']['url'].strip()
-			score = i['data']['score'].strip()
+			score = i['data']['score']
 
 			if len(desc) > self.MAX_CHAR: desc = desc[:self.MAX_CHAR-3]+"..."
 			message.add_field(name=f'[{title}]({link})', value=desc, inline=False)
@@ -85,7 +85,7 @@ class MyCog(commands.Cog):
 		messages = await self.web_bot.view_links()
 		await self.bot.get_guild("").get_channel("").send("Test")
 
-	@daily.after_loop
+	@daily_briefing.after_loop
 	async def daily_briefing_cancel(self):
 		if self.daily_briefing.is_being_cancelled():
 			#do sth
