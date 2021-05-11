@@ -74,6 +74,12 @@ async def quote(ctx, cnt: text_or_int(-1, QUOTE_DAILY) = 1):
             await ctx.send(quote)
 
 
+@quote.error
+async def quote_error(ctx, error):
+    if isinstance(error, commands.BadArgument):
+        await ctx.send('**.quote** Only accepts one argument: number of quotes, or "daily/qotd/today" for quote of the day')
+
+
 @bot.command()
 async def coin(ctx, cnt: typing.Optional[int] = 1):
     message = ""

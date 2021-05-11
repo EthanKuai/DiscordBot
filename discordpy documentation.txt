@@ -4,11 +4,29 @@ typing.Optional[int]
 commands.Greedy[discord.Member]
 Member, User, Message, PartialMessage, TextChannel, VoiceChannel, StageChannel, StoreChannel, CategoryChannel, Invite, Guild, Role, Game, Color, Emoji, PartialEmoji
 
+
+checks
+def guild_only():
+    async def predicate(ctx):
+        if ctx.guild is None:
+            raise NoPrivateMessages('Hey no DMs!')
+        return True
+    return commands.check(predicate)
+@guild_only()
+async def test(ctx):
+    await ctx.send('Hey this is not a DM! Nice.')
+@test.error
+async def test_error(ctx, error):
+    if isinstance(error, NoPrivateMessages):
+        await ctx.send(error)
+
+
 errors
 raise BadArgument('Converting to "{}" failed for parameter "{}".'.format(name, param.name)) from exc
 discord.ext.commands.errors.BadArgument: Converting to "int" failed for parameter "maxn".
 Ignoring exception in command None:
 discord.ext.commands.errors.CommandNotFound: Command "eng" is not found
+
 
 embed mesages etc.
 [word](link)
