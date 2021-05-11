@@ -122,20 +122,26 @@ async def rng(ctx, maxn: int, cnt: typing.Optional[int] = 1):
 
 @bot.command()
 @commands.is_owner()
-async def error(ctx):
+async def _error(ctx):
     await ctx.send("**<Admin>** Error raised.")
     raise discord.DiscordException
 
 
 @bot.command()
 @commands.is_owner()
-async def info(ctx):
+async def _info(ctx):
     try:
         await ctx.send("**<Admin>** Channel information.")
         await ctx.send(f'guild:{ctx.guild}, channel:{ctx.channel}')
         await ctx.send(ctx)
     except:
         error(ctx)
+
+
+@bot.command()
+@commands.is_owner()
+async def _eval(ctx, *, arg):
+    await ctx.send(eval(arg))
 
 
 @bot.command()
