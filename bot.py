@@ -15,7 +15,8 @@ import typing
 
 MAX_LEN = 1950
 TOKEN = os.environ['TOKEN']
-SERVER = os.environ['SERVER']
+GUILDID = os.environ['GUILD_ID']
+CHANNELID = os.environ['CHANNEL_ID']
 DESC = "Hi I am Pseudo, a personal discord bot. Currently in development."
 QUOTES = []
 QUOTE_DAILY = ["today","daily","qotd"]
@@ -23,7 +24,7 @@ QUOTE_DAILY = ["today","daily","qotd"]
 bot = commands.Bot(command_prefix = '.', description = DESC)
 help_dict = json.load(open('help.json',))
 web_bot = web_crawler()
-my_cog = MyCog(bot, web_bot)
+my_cog = MyCog(bot, web_bot, GUILDID, CHANNELID)
 
 
 # print command

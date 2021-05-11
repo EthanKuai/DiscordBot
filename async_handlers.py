@@ -70,9 +70,11 @@ class web_crawler:
 
 
 class MyCog(commands.Cog):
-	def __init__(self, bot, web_bot: web_crawler):
+	def __init__(self, bot, web_bot: web_crawler, GUILDID: str, CHANNELID: str):
 		self.bot = bot
 		self.web_bot = web_bot
+		self.GUILDID = GUILDID
+		self.CHANNELID = CHANNELID
 		self.daily_briefing.add_exception_type(asyncpg.PostgresConnectionError)
 		self.daily_briefing.start()
 
@@ -83,7 +85,9 @@ class MyCog(commands.Cog):
 	async def daily_briefing(self):
 		#loop.run_until_complete(asyncio.gather(self.view_links_async()))
 		messages = await self.web_bot.view_links()
-		await self.bot.get_guild("").get_channel("").send("Test")
+		channel = self.bot.get_guild(self.GUILDID).get_channel(self.CHANNELID)
+		for m in messages:
+			await channel.send(embed = m)
 
 	@daily_briefing.after_loop
 	async def daily_briefing_cancel(self):
