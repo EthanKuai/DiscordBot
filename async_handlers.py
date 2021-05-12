@@ -20,7 +20,7 @@ class web_crawler:
 
 	def trim(self, s: str):
 		if len(s) > self.MAX_CHAR: s = s[:self.MAX_CHAR]+"..."
-		elif len(s) == 0: s = '\u200b' # discord.Embed fuzzyness
+		#elif len(s) == 0: s = '\u200b' # discord.Embed fuzzyness
 		return s
 
 	def read_links(self):
@@ -65,10 +65,13 @@ class web_crawler:
 		for i in jdata:
 			title = self.trim("**"+i['data']['title'].strip()+"**")
 			desc = self.trim(i['data']['selftext'].strip())
-			link = self.trim(i['data']['url'].strip())
+			link = i['data']['url'].strip()
 			score = i['data']['score']
 			#print(f'web_reddit: score={score}, title={title}, link={link}')
-			message.add_field(name=f'[{title}]({link})', value=desc, inline=False)
+			if desc == '':
+				message.add_field(name=f'[{title}]({link})', value=f'Score: {score}', inline=False)
+			else:
+				message.add_field(name=f'[{title}]({link})', value=f'{desc}\nScore: {score}', inline=False)
 		return message
 
 
