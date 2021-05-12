@@ -165,7 +165,7 @@ async def ping(ctx, precision: typing.Optional[int] = 3):
 async def news(ctx):
     await ctx.send("there is supposed to be a news feeds")
     embed = discord.Embed(title="List of webpages you can open",
-                      description="eg: some descriton",
+                      description="eg: some description",
                       colour=discord.Colour(0x3e038c))
     embed.add_field(name="yt", value="[link](https://www.youtube.com/)", inline=False)
     await ctx.send(embed=embed)

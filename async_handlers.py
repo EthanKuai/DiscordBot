@@ -27,7 +27,7 @@ class web_crawler:
 			print("Failed to get links")
 			exit()
 
-	def write_links(self, link):
+	def write_links(self, link: str):
 		self.LINKS.append(link)
 		try:
 			os.environ['LINK'+str(self.LINK_CNT)] = link
@@ -47,7 +47,7 @@ class web_crawler:
 			else: print(f'handler.read_link: link "{link}" does not match any known APIs!')
 		return messages
 
-	async def web_json(self, url):
+	async def web_json(self, url: str):
 		async with self.client.get(url) as response:
 			assert response.status == 200
 			return await response.read()
@@ -65,12 +65,12 @@ class web_crawler:
 
 			if len(desc) > self.MAX_CHAR: desc = desc[:self.MAX_CHAR-3]+"..."
 			message.add_field(name=f'[{title}]({link})', value=desc, inline=False)
-			print(f'web_reddit: score={score}, title={title}, link={link}')
+			#print(f'web_reddit: score={score}, title={title}, link={link}')
 		return message
 
 
 class MyCog(commands.Cog):
-	def __init__(self, bot, web_bot: web_crawler, GUILDID: str, CHANNELID: str):
+	def __init__(self, bot: commands.bot, web_bot: web_crawler, GUILDID: int, CHANNELID: int):
 		self.bot = bot
 		self.web_bot = web_bot
 		self.GUILDID = GUILDID
@@ -78,19 +78,28 @@ class MyCog(commands.Cog):
 		self.daily_briefing.add_exception_type(asyncpg.PostgresConnectionError)
 		self.daily_briefing.start()
 
-	def cog_unload(self):
-		self.daily_briefing.cancel()
-
-	@tasks.loop(hours=24.0)
+	@tasks.loop(hours=0.0, minutes = 2.0)
 	async def daily_briefing(self):
+		channel = self.bot.get_guild(self.GUILDID).get_channel(self.CHANNELID)
+		await channel.send("daily briefing up and coming!")
 		#loop.run_until_complete(asyncio.gather(self.view_links_async()))
 		messages = await self.web_bot.view_links()
-		channel = self.bot.get_guild(self.GUILDID).get_channel(self.CHANNELID)
+		await channel.send("daily briefing starting!")
 		for m in messages:
+			print(m.to_dict())
 			await channel.send(embed = m)
+
+	@daily_briefing.before_loop
+	async def daily_briefing_before(self):
+		print('waiting for bot to commect...')
+		await self.bot.wait_until_ready()
+		print('bot connected, cog now ready!')
 
 	@daily_briefing.after_loop
 	async def daily_briefing_cancel(self):
 		if self.daily_briefing.is_being_cancelled():
 			#do sth
 			pass
+
+	def cog_unload(self):
+		self.daily_briefing.cancel()
