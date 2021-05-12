@@ -17,6 +17,7 @@ MAX_LEN = 1950
 TOKEN = os.environ['TOKEN']
 GUILDID = int(os.environ['GUILD_ID'])
 CHANNELID = int(os.environ['CHANNEL_ID'])
+TIME = int(os.environ['TIME'])
 DESC = "Hi I am Pseudo, a personal discord bot. Currently in development."
 QUOTES = []
 QUOTE_DAILY = ["today","daily","qotd"]
@@ -24,7 +25,7 @@ QUOTE_DAILY = ["today","daily","qotd"]
 bot = commands.Bot(command_prefix = '.', description = DESC)
 help_dict = json.load(open('help.json',))
 web_bot = web_crawler()
-my_cog = MyCog(bot, web_bot, GUILDID, CHANNELID)
+my_cog = MyCog(bot, web_bot, GUILDID, CHANNELID, TIME)
 
 
 # print command

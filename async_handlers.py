@@ -1,3 +1,4 @@
+from logging import error
 import discord
 from discord.ext import commands, tasks
 
@@ -7,12 +8,12 @@ import asyncio
 import aiohttp
 import json
 import os
-import datetime
+from datetime import datetime, date, timedelta
 
 
 class web_crawler:
 	def __init__(self):
-		self.MAX_CHAR = 250
+		self.MAX_CHAR = 180
 		self.loop = asyncio.get_event_loop()
 		self.client = aiohttp.ClientSession(loop=self.loop)
 		self.LINK_CNT = int(os.environ['LINK_CNT'])
@@ -67,50 +68,60 @@ class web_crawler:
 		for i in jdata:
 			link = "https://reddit.com" + i['data']['permalink'].strip()
 			score = i['data']['score']
-			title = self.trim("**"+i['data']['title'].strip()+"**")
+			comments = i['data']['num_comments']
+			author = self.trim(i['data']['author'].strip(), 27)
+			title = self.trim("**"+i['data']['title'].strip())+"**"
 			desc = self.trim(i['data']['selftext'].strip())
-			moreinfo = i['data']['url'].strip()
-			#print(f'web_reddit: score={score}, title={title}, link={link}')
-			if desc == '':
-				#message.add_field(name=f'[{title}]({link})', value=f'Score: {score}', inline=False)
-				description = f'[{title}]({link})\nScore: {score}\n'
-			else:
-				#message.add_field(name=f'[{title}]({link})', value=f'{desc}\nScore: {score}', inline=False)
-				description = f'[{title}]({link})\n{desc}\nScore: {score}\n'
+
+			description += f'[{title}]({link})\n'
+			if desc != '': description += f'{desc}\n'
+			description += f'Score: {score} Comments: {comments} Author: {author}\n\n'
+			#message.add_field(name=f'[{title}]({link})', value=f'{desc}\nScore: {score}', inline=False)
 		message.description = description.strip()
 		return message
 
 
 class MyCog(commands.Cog):
-	def __init__(self, bot: commands.bot, web_bot: web_crawler, GUILDID: int, CHANNELID: int):
+	def __init__(self, bot: commands.bot, web_bot: web_crawler, GUILDID: int, CHANNELID: int, TIME: int):
 		self.bot = bot
 		self.web_bot = web_bot
 		self.GUILDID = GUILDID
 		self.CHANNELID = CHANNELID
+		self.TIME = TIME
 		self.lock = asyncio.Lock()
 		self.daily_briefing.add_exception_type(asyncpg.PostgresConnectionError)
 		self.daily_briefing.start()
 
 	@tasks.loop(hours=24.0, minutes = 0.0)
 	async def daily_briefing(self):
-		await self.channel_db.send("Your daily briefing up and coming!")
+		await self.db_channel.send("Your daily briefing up and coming!")
 		#loop.run_until_complete(asyncio.gather(self.view_links_async()))
 		messages = await self.web_bot.view_links()
 		for m in messages:
-			await self.channel_db.send(embed = m)
+			await self.db_channel.send(embed = m)
 
 	@daily_briefing.before_loop
 	async def daily_briefing_before(self):
 		print('Waiting for bot to connect...')
 		await self.bot.wait_until_ready()
 		print('Bot connected, cog now ready!')
-		self.channel_db = self.bot.get_guild(self.GUILDID).get_channel(self.CHANNELID)
+		self.db_channel = self.bot.get_guild(self.GUILDID).get_channel(self.CHANNELID)
+
+		today = datetime.today()
+		start = datetime.combine(date.today()+timedelta(days=1), datetime.min.time())
+		delta = int((start-today).total_seconds())
+		await asyncio.sleep(delta)
+
 
 	@daily_briefing.after_loop
 	async def daily_briefing_cancel(self):
 		if self.daily_briefing.is_being_cancelled():
 			#do sth
 			pass
+
+	@daily_briefing.error
+	async def error_handle(self,err0r):
+		pass
 
 	def cog_unload(self):
 		self.daily_briefing.cancel()
