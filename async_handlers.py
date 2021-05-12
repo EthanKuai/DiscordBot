@@ -18,8 +18,9 @@ class web_crawler:
 		self.LINK_CNT = int(os.environ['LINK_CNT'])
 		self.read_links()
 
-	def trim(self, s: str):
-		if len(s) > self.MAX_CHAR: s = s[:self.MAX_CHAR]+"..."
+	def trim(self, s: str, maxlen = -1):
+		if maxlen == -1: maxlen = self.MAX_CHAR # not allowed in header :(
+		if len(s) > maxlen: s = s[:maxlen-3]+"..."
 		#elif len(s) == 0: s = '\u200b' # discord.Embed fuzzyness
 		return s
 
@@ -63,10 +64,11 @@ class web_crawler:
 		message = discord.Embed(title=f"Reddit's top today: {subreddit}", colour=discord.Colour(0x3e038c))
 
 		for i in jdata:
+			link = "https://reddit.com" + i['data']['permalink'].strip()
+			score = i['data']['score']
 			title = self.trim("**"+i['data']['title'].strip()+"**")
 			desc = self.trim(i['data']['selftext'].strip())
-			link = i['data']['url'].strip()
-			score = i['data']['score']
+			moreinfo = i['data']['url'].strip()
 			#print(f'web_reddit: score={score}, title={title}, link={link}')
 			if desc == '':
 				message.add_field(name=f'[{title}]({link})', value=f'Score: {score}', inline=False)
@@ -84,7 +86,7 @@ class MyCog(commands.Cog):
 		self.daily_briefing.add_exception_type(asyncpg.PostgresConnectionError)
 		self.daily_briefing.start()
 
-	@tasks.loop(hours=0.0, minutes = 2.0)
+	@tasks.loop(hours=24.0, minutes = 0.0)
 	async def daily_briefing(self):
 		channel = self.bot.get_guild(self.GUILDID).get_channel(self.CHANNELID)
 		await channel.send("daily briefing up and coming!")

@@ -42,8 +42,17 @@ async def p(ctx,out):
 
 @bot.command()
 async def echo(ctx,cnt: typing.Optional[int] = 1,*,response):
-    for i in range(max(cnt,10)):
+    for i in range(min(cnt,10)):
         await ctx.send(response)
+
+
+@bot.command()
+@commands.is_owner()
+async def _embed(ctx,*,arg):
+    try:
+        await ctx.send(embed = eval(f'discord.Embed({arg})'))
+    except:
+        await ctx.send("failed.")
 
 
 @bot.command()
@@ -132,9 +141,24 @@ async def _error(ctx, *description):
 @commands.is_owner()
 async def _info(ctx):
     try:
-        await ctx.send("**<Admin>** Channel information.")
-        await ctx.send(f'guild:{ctx.guild}, channel:{ctx.channel}')
-        await ctx.send(ctx)
+        out = "**<Admin>** Channel information.\n"
+
+        out += f'**guild:**{ctx.guild}, **guild id:**{ctx.guild.id}\n'
+
+        out += f'**channel:**{ctx.channel}, **channel id:**{ctx.channel.id}\n'
+        out += '**text channel list of guild:**\n'
+        for channel in ctx.guild.channels:
+            if channel.type == 'text': out += f'{channel} '
+        out += '\n'
+
+        out += f'**author:**{ctx.author}, **author id :**{ctx.author.id}\n'
+        out += '**member list of guild:**\n'
+        for m in ctx.guild.fetch_members(limit=100):
+            out += f'({m}, {m.id}) '
+        out += '\n'
+
+        out += f'Functions of ctx: use command `dir(ctx)`'
+        await p(ctx, out)
     except:
         await ctx.send("failed.")
         await _error(ctx, "_info failed")
@@ -162,7 +186,7 @@ async def daily(ctx):
 
 @bot.command()
 async def ping(ctx, precision: typing.Optional[int] = 3):
-    await ctx.send('Pong! Latency: {0}'.format(round(bot.latency, precision)))
+    await ctx.reply('Pong! Latency: {0}'.format(round(bot.latency, precision)))
 
 
 @bot.command()
