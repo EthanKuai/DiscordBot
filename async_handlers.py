@@ -12,11 +12,16 @@ import datetime
 
 class web_crawler:
 	def __init__(self):
-		self.MAX_CHAR = 200
+		self.MAX_CHAR = 250
 		self.loop = asyncio.get_event_loop()
 		self.client = aiohttp.ClientSession(loop=self.loop)
 		self.LINK_CNT = int(os.environ['LINK_CNT'])
 		self.read_links()
+
+	def trim(self, s: str):
+		if len(s) > self.MAX_CHAR: s = s[:self.MAX_CHAR]+"..."
+		elif len(s) == 0: s = '\u200b' # discord.Embed fuzzyness
+		return s
 
 	def read_links(self):
 		self.LINKS = []
@@ -58,14 +63,12 @@ class web_crawler:
 		message = discord.Embed(title=f"Reddit's top today: {subreddit}", colour=discord.Colour(0x3e038c))
 
 		for i in jdata:
-			title = "**"+i['data']['title'].strip()+"**"
-			desc = i['data']['selftext'].strip()
-			link = i['data']['url'].strip()
+			title = self.trim("**"+i['data']['title'].strip()+"**")
+			desc = self.trim(i['data']['selftext'].strip())
+			link = self.trim(i['data']['url'].strip())
 			score = i['data']['score']
-
-			if len(desc) > self.MAX_CHAR: desc = desc[:self.MAX_CHAR-3]+"..."
-			message.add_field(name=f'[{title}]({link})', value=desc, inline=False)
 			#print(f'web_reddit: score={score}, title={title}, link={link}')
+			message.add_field(name=f'[{title}]({link})', value=desc, inline=False)
 		return message
 
 
