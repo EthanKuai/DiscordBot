@@ -62,6 +62,7 @@ class web_crawler:
 		jdata = json.loads(data.decode('utf-8'))['data']['children']
 		subreddit = jdata[0]['data']['subreddit_name_prefixed']
 		message = discord.Embed(title=f"Reddit's top today: {subreddit}", colour=discord.Colour(0x3e038c))
+		description = ""
 
 		for i in jdata:
 			link = "https://reddit.com" + i['data']['permalink'].strip()
@@ -71,9 +72,12 @@ class web_crawler:
 			moreinfo = i['data']['url'].strip()
 			#print(f'web_reddit: score={score}, title={title}, link={link}')
 			if desc == '':
-				message.add_field(name=f'[{title}]({link})', value=f'Score: {score}', inline=False)
+				#message.add_field(name=f'[{title}]({link})', value=f'Score: {score}', inline=False)
+				description = f'[{title}]({link})\nScore: {score}\n'
 			else:
-				message.add_field(name=f'[{title}]({link})', value=f'{desc}\nScore: {score}', inline=False)
+				#message.add_field(name=f'[{title}]({link})', value=f'{desc}\nScore: {score}', inline=False)
+				description = f'[{title}]({link})\n{desc}\nScore: {score}\n'
+		message.description = description.strip()
 		return message
 
 
@@ -83,25 +87,24 @@ class MyCog(commands.Cog):
 		self.web_bot = web_bot
 		self.GUILDID = GUILDID
 		self.CHANNELID = CHANNELID
+		self.lock = asyncio.Lock()
 		self.daily_briefing.add_exception_type(asyncpg.PostgresConnectionError)
 		self.daily_briefing.start()
 
 	@tasks.loop(hours=24.0, minutes = 0.0)
 	async def daily_briefing(self):
-		channel = self.bot.get_guild(self.GUILDID).get_channel(self.CHANNELID)
-		await channel.send("daily briefing up and coming!")
+		await self.channel_db.send("Your daily briefing up and coming!")
 		#loop.run_until_complete(asyncio.gather(self.view_links_async()))
 		messages = await self.web_bot.view_links()
-		await channel.send("daily briefing starting!")
 		for m in messages:
-			print(m.to_dict())
-			await channel.send(embed = m)
+			await self.channel_db.send(embed = m)
 
 	@daily_briefing.before_loop
 	async def daily_briefing_before(self):
-		print('waiting for bot to commect...')
+		print('Waiting for bot to connect...')
 		await self.bot.wait_until_ready()
-		print('bot connected, cog now ready!')
+		print('Bot connected, cog now ready!')
+		self.channel_db = self.bot.get_guild(self.GUILDID).get_channel(self.CHANNELID)
 
 	@daily_briefing.after_loop
 	async def daily_briefing_cancel(self):
