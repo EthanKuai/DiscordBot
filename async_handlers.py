@@ -25,14 +25,23 @@ class web_crawler:
 		for i in self.TRIM: s = s.replace(i[0],i[1])
 		s = re.split(';|\n', s.strip())
 		for ss in s:
+			if maxlen < 0:
+				print('theres something wrong!!!')
+				exit()
 			ss = ss.strip()
 			if ss == '' or ss == '&gt' or ss == '&amp': continue # reddit formatting
 			if ss[0] == '#' and len(ss) == 6: continue # color code
 			maxlen -= len(ss) + 1
 			if maxlen >= -1:
 				out += ss + ' '
-			else:
+			elif maxlen > -7:
 				out += ss[:maxlen]
+				break
+			else:
+				index = ss[:max(-1,maxlen+6)].find("](http")
+				if index != -1:
+					out += ss[:index + ss[index:].find(")")]
+				else: out += ss[:maxlen]
 				break
 		if maxlen >= -1: out = out[:-1]
 		else: out = out[:-3] + "..."
