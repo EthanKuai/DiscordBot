@@ -8,7 +8,8 @@ import asyncio
 import aiohttp
 import json
 import os
-from datetime import datetime, date, timedelta
+from datetime import datetime, timezone, timedelta
+import pytz
 
 
 class web_crawler:
@@ -88,6 +89,9 @@ class MyCog(commands.Cog):
 		self.GUILDID = GUILDID
 		self.CHANNELID = CHANNELID
 		self.TIME = TIME
+		#self.tz = pytz.timezone('Asia/Singapore')
+		self.tz = timezone(timedelta(hours=8))
+
 		self.lock = asyncio.Lock()
 		self.daily_briefing.add_exception_type(asyncpg.PostgresConnectionError)
 		self.daily_briefing.start()
@@ -105,12 +109,16 @@ class MyCog(commands.Cog):
 		print('Waiting for bot to connect...')
 		await self.bot.wait_until_ready()
 		print('Bot connected, cog now ready!')
-		self.db_channel = self.bot.get_guild(self.GUILDID).get_channel(self.CHANNELID)
 
-		today = datetime.today()
-		start = datetime.combine(date.today()+timedelta(days=1), datetime.min.time())
+		#today = datetime.today().astimezone(self.tz)
+		#start = datetime.today().astimezone(self.tz)
+		today = datetime.now(tz = self.tz)
+		start = datetime(today.year, today.month, today.day, self.TIME, 0, 0, 0, tzinfo=self.tz)
 		delta = int((start-today).total_seconds())
+		if delta < 0: delta += 86400
+		print(f'cog waiting for {delta} seconds')
 		await asyncio.sleep(delta)
+		self.db_channel = self.bot.get_guild(self.GUILDID).get_channel(self.CHANNELID)
 
 
 	@daily_briefing.after_loop
