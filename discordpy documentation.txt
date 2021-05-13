@@ -39,3 +39,9 @@ await ctx.send(embed=embed)
 
 loop.run_until_complete(asyncio.gather(self.view_links_async()))
 asyncio.get_event_loop(fn)
+
+
+db["key"] = "val"
+val = db["key"]
+del db["key"]
+db.prefix('prefix')

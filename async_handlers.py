@@ -60,7 +60,7 @@ class web_crawler:
 			score = i['data']['score']
 			comments = i['data']['num_comments']
 			author = self.trim(i['data']['author'], 27)
-			title = self.trim("**"+i['data']['title'])+"**"
+			title = "**"+self.trim(i['data']['title'])+"**"
 			desc = self.trim(i['data']['selftext'])
 			subreddit = i['data']['subreddit_name_prefixed']
 
@@ -83,9 +83,12 @@ class MyCog(commands.Cog):
 		self.daily_briefing.start()
 
 	@tasks.loop(hours=24.0, minutes = 0.0)
-	async def daily_briefing(self):
+	async def daily_briefing(self, guild: int = -1, channel: int = -1):
 		async with self.lock:
-			channel = self.bot.get_guild(self.db.GUILD_ID).get_channel(self.db.DAILY_CHANNEL)
+			if channel == -1 and guild == -1:
+				channel = self.bot.get_guild(self.db.GUILD_ID).get_channel(self.db.DAILY_CHANNEL)
+			else:
+				channel = self.bot.get_guild(guild).get_channel(channel)
 			await channel.send("Your daily briefing up and coming!")
 			messages = await self.web_bot.view_links()
 			for m in messages:

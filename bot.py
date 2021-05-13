@@ -179,7 +179,7 @@ async def hi(ctx):
 @bot.command()
 async def daily(ctx):
     await quote(ctx,-1)
-    await my_cog.daily_briefing()
+    await my_cog.daily_briefing(ctx.guild.id, ctx.channel.id)
     await ctx.send("There is supposed to be other dailies.")
 
 

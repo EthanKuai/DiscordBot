@@ -17,7 +17,7 @@ class db_accessor:
 		except:
 			print("db.__init__: Failed to read environmental variables & database")
 			exit()
-		self.TZ = timezone(timedelta(hours=self.TZ_OFFSET))
+		self.tz = timezone(timedelta(hours=self.TZ_OFFSET))
 		self.read_links()
 
 	def read_links(self):
@@ -42,7 +42,7 @@ class db_accessor:
 
 	async def update_data(self):
 		try:
-			self.TZ = timezone(timedelta(hours=self.TZ_OFFSET))
+			self.tz = timezone(timedelta(hours=self.TZ_OFFSET))
 			for i in self.ENV_LST:
 				os.environ[i] = str(exec(f'self.{i}'))
 		except:
