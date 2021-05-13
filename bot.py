@@ -6,7 +6,7 @@ import os
 
 from async_handlers import *
 from converters import *
-import asyncio
+from database import db_accessor
 import requests
 import json
 import random
@@ -14,18 +14,15 @@ import typing
 
 
 MAX_LEN = 1950
-TOKEN = os.environ['TOKEN']
-GUILDID = int(os.environ['GUILD_ID'])
-CHANNELID = int(os.environ['CHANNEL_ID'])
-TIME = int(os.environ['TIME_DB'])
 DESC = "Hi I am Pseudo, a personal discord bot. Currently in development."
 QUOTES = []
 QUOTE_DAILY = ["today","daily","qotd"]
 
 bot = commands.Bot(command_prefix = '.', description = DESC)
 help_dict = json.load(open('help.json',))
-web_bot = web_crawler()
-my_cog = MyCog(bot, web_bot, GUILDID, CHANNELID, TIME)
+db = db_accessor()
+web_bot = web_crawler(db)
+my_cog = MyCog(bot, web_bot, db)
 
 
 # print command
@@ -181,7 +178,7 @@ async def hi(ctx):
 
 @bot.command()
 async def daily(ctx):
-    await quote(ctx,("today"))
+    await quote(ctx,-1)
     await my_cog.daily_briefing()
     await ctx.send("There is supposed to be other dailies.")
 
@@ -197,4 +194,4 @@ async def news(ctx):
 
 
 keep_alive()
-bot.run(TOKEN)
+bot.run(db.TOKEN)

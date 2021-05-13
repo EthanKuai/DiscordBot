@@ -1,6 +1,6 @@
-from logging import error
 import discord
 from discord.ext import commands, tasks
+from database import db_accessor
 
 
 from datetime import datetime, timezone, timedelta
@@ -8,22 +8,22 @@ import asyncpg
 import asyncio
 import aiohttp
 import json
-import os
 import re
 
 
 class web_crawler:
-	def __init__(self):
+	def __init__(self, db: db_accessor):
 		self.MAX_CHAR = 170
+		self.db = db
 		self.loop = asyncio.get_event_loop()
 		self.client = aiohttp.ClientSession(loop=self.loop)
-		self.LINK_CNT = int(os.environ['LINK_CNT'])
-		self.read_links()
+		self.TRIM = [("*",""),("`",""),(">>> ",""),("  "," "),(" _"," "),("_ "," ")]
 
 	def trim(self, s: str, maxlen: int = -1):
 		if maxlen == -1: maxlen = self.MAX_CHAR # not allowed in header :(
 		out = ''
-		s = re.split(';\n', s.strip())
+		for i in self.TRIM: s = s.replace(i[0],i[1])
+		s = re.split(';|\n', s.strip())
 		for ss in s:
 			ss = ss.strip()
 			if ss == '' or ss == '&gt' or ss == '&amp': continue # reddit formatting
@@ -36,32 +36,11 @@ class web_crawler:
 				break
 		if maxlen >= -1: out = out[:-1]
 		else: out = out[:-3] + "..."
-		return out
-
-	def read_links(self):
-		self.LINKS = []
-		try:
-			for i in range(self.LINK_CNT):
-				self.LINKS.append(os.environ['LINK'+str(i)])
-		except:
-			print("Failed to get links")
-			exit()
-
-	def write_links(self, link: str):
-		self.LINKS.append(link)
-		try:
-			os.environ['LINK'+str(self.LINK_CNT)] = link
-			self.LINK_CNT += 1
-			os.environ['LINK_CNT'] = str(self.LINK_CNT)
-			print("write_links: Successfully wrote new link")
-			return True
-		except:
-			print("write_links: Failed to write link to environmental variables")
-			return False
+		return out.replace("  "," ")
 
 	async def view_links(self):
 		messages = []
-		for link in self.LINKS:
+		for link in self.db.LINKS:
 			data = await self.web_json(link)
 			if link.startswith("https://www.reddit.com"): messages.append(await self.web_reddit(data))
 			else: print(f'handler.read_link: link "{link}" does not match any known APIs!')
@@ -95,25 +74,22 @@ class web_crawler:
 
 
 class MyCog(commands.Cog):
-	def __init__(self, bot: commands.bot, web_bot: web_crawler, GUILDID: int, CHANNELID: int, TIME: int):
+	def __init__(self, bot: commands.bot, web_bot: web_crawler, db: db_accessor):
 		self.bot = bot
 		self.web_bot = web_bot
-		self.GUILDID = GUILDID
-		self.CHANNELID = CHANNELID
-		self.TIME = TIME
-		self.tz = timezone(timedelta(hours=8))
-
+		self.db = db
 		self.lock = asyncio.Lock()
 		self.daily_briefing.add_exception_type(asyncpg.PostgresConnectionError)
 		self.daily_briefing.start()
 
 	@tasks.loop(hours=24.0, minutes = 0.0)
 	async def daily_briefing(self):
-		await self.db_channel.send("Your daily briefing up and coming!")
 		async with self.lock:
+			channel = self.bot.get_guild(self.db.GUILD_ID).get_channel(self.db.DAILY_CHANNEL)
+			await channel.send("Your daily briefing up and coming!")
 			messages = await self.web_bot.view_links()
-		for m in messages:
-			await self.db_channel.send(embed = m)
+			for m in messages:
+				await channel.send(embed = m)
 
 	@daily_briefing.before_loop
 	async def daily_briefing_before(self):
@@ -121,23 +97,23 @@ class MyCog(commands.Cog):
 		await self.bot.wait_until_ready()
 		print('Bot connected, cog now ready!')
 
-		today = datetime.now(tz = self.tz)
-		start = datetime(today.year, today.month, today.day, self.TIME, 0, 0, 0, tzinfo=self.tz)
+		today = datetime.now(tz = self.db.tz)
+		start = datetime(today.year, today.month, today.day, self.db.DAILY_TIME, 0, 0, 0, tzinfo=self.db.tz)
 		delta = int((start-today).total_seconds())
 		if delta < 0: delta += 86400
 		print(f'cog waiting for {delta} seconds')
 		await asyncio.sleep(delta)
-		self.db_channel = self.bot.get_guild(self.GUILDID).get_channel(self.CHANNELID)
+		print('cog done waiting!')
 
 
 	@daily_briefing.after_loop
 	async def daily_briefing_cancel(self):
 		if self.daily_briefing.is_being_cancelled():
-			#do sth
 			pass
 
 	@daily_briefing.error
-	async def error_handle(self,err0r):
+	async def error_handle(self,error):
+		print(f'MyCog: error {error}')
 		pass
 
 	def cog_unload(self):
