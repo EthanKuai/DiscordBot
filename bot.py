@@ -18,7 +18,9 @@ QUOTES = []
 QUOTE_DAILY = ["today","daily","qotd","day"]
 REDDIT = {"now":"now", "hour":"hour", "day":"day", "daily":"day", "today":"day", "week":"week", "month":"month", "year":"year", "all":"all", "alltime":"all", "overall":"all"}
 
-bot = commands.Bot(command_prefix = '.', description = DESC)
+intents = discord.Intents.default()
+intents.members = True
+bot = commands.Bot(command_prefix = '.', description = DESC, intents = intents)
 help_dict = json.load(open('help.json',))
 db = db_accessor()
 web_bot = web_crawler(db)
@@ -29,7 +31,9 @@ my_cog = MyCog(bot, web_bot, db)
 async def p(ctx,out):
 	response = out.split("\n")
 	for line in response:
-		if len(line) < MAX_LEN:
+		line = line.strip()
+		if len(line) == 0: continue
+		elif len(line) < MAX_LEN:
 			await ctx.send(line)
 		else:
 			i = 0
@@ -146,12 +150,12 @@ async def _info(ctx):
 		out += f'**channel:**{ctx.channel}, **channel id:**{ctx.channel.id}\n'
 		out += '**text channel list of guild:**\n'
 		for channel in ctx.guild.channels:
-			if channel.type == 'text': out += f'{channel} '
+			out += f'{channel} '
 		out += '\n'
 
 		out += f'**author:**{ctx.author}, **author id :**{ctx.author.id}\n'
 		out += '**member list of guild:**\n'
-		for m in ctx.guild.fetch_members(limit=100):
+		for m in ctx.guild.members:
 			out += f'({m}, {m.id}) '
 		out += '\n'
 
