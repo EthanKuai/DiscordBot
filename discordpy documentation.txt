@@ -30,3 +30,12 @@ discord.ext.commands.errors.CommandNotFound: Command "eng" is not found
 
 embed mesages etc.
 [word](link)
+s = '\u200b' # discord.Embed fuzzyness
+embed = discord.Embed(title="List of webpages you can open",
+					description="eg: some description",
+					colour=discord.Colour(0x3e038c))
+embed.add_field(name="yt", value="[link](https://www.youtube.com/)", inline=False)
+await ctx.send(embed=embed)
+
+loop.run_until_complete(asyncio.gather(self.view_links_async()))
+

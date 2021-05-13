@@ -182,6 +182,7 @@ async def hi(ctx):
 @bot.command()
 async def daily(ctx):
     await quote(ctx,("today"))
+    await my_cog.daily_briefing()
     await ctx.send("There is supposed to be other dailies.")
 
 
@@ -193,11 +194,6 @@ async def ping(ctx, precision: typing.Optional[int] = 3):
 @bot.command()
 async def news(ctx):
     await ctx.send("there is supposed to be a news feeds")
-    embed = discord.Embed(title="List of webpages you can open",
-                      description="eg: some description",
-                      colour=discord.Colour(0x3e038c))
-    embed.add_field(name="yt", value="[link](https://www.youtube.com/)", inline=False)
-    await ctx.send(embed=embed)
 
 
 keep_alive()

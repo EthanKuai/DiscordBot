@@ -9,22 +9,33 @@ import aiohttp
 import json
 import os
 from datetime import datetime, timezone, timedelta
-import pytz
 
 
 class web_crawler:
 	def __init__(self):
-		self.MAX_CHAR = 180
+		self.MAX_CHAR = 170
 		self.loop = asyncio.get_event_loop()
 		self.client = aiohttp.ClientSession(loop=self.loop)
 		self.LINK_CNT = int(os.environ['LINK_CNT'])
 		self.read_links()
 
-	def trim(self, s: str, maxlen = -1):
+	def trim(self, s: str, maxlen: int = -1):
 		if maxlen == -1: maxlen = self.MAX_CHAR # not allowed in header :(
-		if len(s) > maxlen: s = s[:maxlen-3]+"..."
-		#elif len(s) == 0: s = '\u200b' # discord.Embed fuzzyness
-		return s
+		out = ''
+		s = s.strip().split(';\n')
+		for ss in s:
+			ss = ss.strip()
+			if ss == '' or ss == '&gt' or ss == '&amp': continue # reddit formatting
+			if ss[0] == '#' and len(ss) == 6: continue # color code
+			maxlen -= len(ss) + 1
+			if maxlen >= -1:
+				out += ss + ' '
+			else:
+				out += ss[:maxlen]
+				break
+		if maxlen >= -1: out = out[:-1]
+		else: out = out[:-3] + "..."
+		return out
 
 	def read_links(self):
 		self.LINKS = []
@@ -62,23 +73,23 @@ class web_crawler:
 
 	async def web_reddit(self, data):
 		jdata = json.loads(data.decode('utf-8'))['data']['children']
-		subreddit = jdata[0]['data']['subreddit_name_prefixed']
-		message = discord.Embed(title=f"Reddit's top today: {subreddit}", colour=discord.Colour(0x3e038c))
 		description = ""
 
 		for i in jdata:
 			link = "https://reddit.com" + i['data']['permalink'].strip()
 			score = i['data']['score']
 			comments = i['data']['num_comments']
-			author = self.trim(i['data']['author'].strip(), 27)
-			title = self.trim("**"+i['data']['title'].strip())+"**"
-			desc = self.trim(i['data']['selftext'].strip())
+			author = self.trim(i['data']['author'], 27)
+			title = self.trim("**"+i['data']['title'])+"**"
+			desc = self.trim(i['data']['selftext'])
+			subreddit = i['data']['subreddit_name_prefixed']
 
 			description += f'[{title}]({link})\n'
 			if desc != '': description += f'{desc}\n'
 			description += f'Score: {score} Comments: {comments} Author: {author}\n\n'
-			#message.add_field(name=f'[{title}]({link})', value=f'{desc}\nScore: {score}', inline=False)
-		message.description = description.strip()
+
+		message = discord.Embed(title=f"Reddit's top today: {subreddit}",\
+			description = description.strip(), colour=discord.Colour(0x3e038c))
 		return message
 
 
@@ -89,7 +100,6 @@ class MyCog(commands.Cog):
 		self.GUILDID = GUILDID
 		self.CHANNELID = CHANNELID
 		self.TIME = TIME
-		#self.tz = pytz.timezone('Asia/Singapore')
 		self.tz = timezone(timedelta(hours=8))
 
 		self.lock = asyncio.Lock()
@@ -99,8 +109,8 @@ class MyCog(commands.Cog):
 	@tasks.loop(hours=24.0, minutes = 0.0)
 	async def daily_briefing(self):
 		await self.db_channel.send("Your daily briefing up and coming!")
-		#loop.run_until_complete(asyncio.gather(self.view_links_async()))
-		messages = await self.web_bot.view_links()
+		async with self.lock:
+			messages = await self.web_bot.view_links()
 		for m in messages:
 			await self.db_channel.send(embed = m)
 
@@ -110,8 +120,6 @@ class MyCog(commands.Cog):
 		await self.bot.wait_until_ready()
 		print('Bot connected, cog now ready!')
 
-		#today = datetime.today().astimezone(self.tz)
-		#start = datetime.today().astimezone(self.tz)
 		today = datetime.now(tz = self.tz)
 		start = datetime(today.year, today.month, today.day, self.TIME, 0, 0, 0, tzinfo=self.tz)
 		delta = int((start-today).total_seconds())
