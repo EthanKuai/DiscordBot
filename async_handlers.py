@@ -50,8 +50,7 @@ class web_crawler:
 	async def view_links(self):
 		messages = []
 		for link in self.db.LINKS:
-			data = await self.web_json(link)
-			if link.startswith("https://www.reddit.com"): messages.append(await self.web_reddit(data))
+			if link.startswith("https://www.reddit.com"): messages.append(await self.web_reddit(link))
 			else: print(f'handler.read_link: link "{link}" does not match any known APIs!')
 		return messages
 
@@ -60,11 +59,12 @@ class web_crawler:
 			assert response.status == 200
 			return await response.read()
 
-	async def web_reddit(self, data):
-		jdata = json.loads(data.decode('utf-8'))['data']['children']
+	async def web_reddit(self, link: str):
+		data = await self.web_json(link)
+		data = json.loads(data.decode('utf-8'))['data']['children']
 		description = ""
 
-		for i in jdata:
+		for i in data:
 			link = "https://reddit.com" + i['data']['permalink'].strip()
 			score = i['data']['score']
 			comments = i['data']['num_comments']
@@ -92,16 +92,14 @@ class MyCog(commands.Cog):
 		self.daily_briefing.start()
 
 	@tasks.loop(hours=24.0, minutes = 0.0)
-	async def daily_briefing(self, guild: int = -1, channel: int = -1):
+	async def daily_briefing(self, ctx = None):
 		async with self.lock:
-			if channel == -1 and guild == -1:
-				channel = self.bot.get_guild(self.db.GUILD_ID).get_channel(self.db.DAILY_CHANNEL)
-			else:
-				channel = self.bot.get_guild(guild).get_channel(channel)
-			await channel.send("Your daily briefing up and coming!")
+			if ctx == None:
+				ctx = self.bot.get_guild(self.db.GUILD_ID).get_channel(self.db.DAILY_CHANNEL)
+			await ctx.send("Your daily briefing up and coming!")
 			messages = await self.web_bot.view_links()
 			for m in messages:
-				await channel.send(embed = m)
+				await ctx.send(embed = m)
 
 	@daily_briefing.before_loop
 	async def daily_briefing_before(self):

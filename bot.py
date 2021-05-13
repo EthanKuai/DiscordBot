@@ -15,7 +15,8 @@ import typing
 MAX_LEN = 1950
 DESC = "Hi I am Pseudo, a personal discord bot. Currently in development."
 QUOTES = []
-QUOTE_DAILY = ["today","daily","qotd"]
+QUOTE_DAILY = ["today","daily","qotd","day"]
+REDDIT = {"now":"now", "hour":"hour", "day":"day", "daily":"day", "today":"day", "week":"week", "month":"month", "year":"year", "all":"all", "alltime":"all", "overall":"all"}
 
 bot = commands.Bot(command_prefix = '.', description = DESC)
 help_dict = json.load(open('help.json',))
@@ -84,7 +85,7 @@ async def quote(ctx, cnt: text_or_int(-1, QUOTE_DAILY) = 1):
 @quote.error
 async def quote_error(ctx, error):
 	if isinstance(error, commands.BadArgument):
-		await ctx.send('**.quote** Only accepts one argument: number of quotes, or "daily/qotd/today" for quote of the day')
+		await ctx.send('**.quote** Only accepts one argument (opt): *number of quotes*, or *"daily/qotd/today"* for quote of the day')
 
 
 @bot.command()
@@ -178,7 +179,7 @@ async def hi(ctx):
 @bot.command()
 async def daily(ctx):
 	await quote(ctx,-1)
-	await my_cog.daily_briefing(ctx.guild.id, ctx.channel.id)
+	await my_cog.daily_briefing(ctx)
 	await ctx.send("There is supposed to be other dailies.")
 
 
@@ -188,8 +189,23 @@ async def ping(ctx, precision: typing.Optional[int] = 3):
 
 
 @bot.command()
-async def news(ctx):
+async def gnews(ctx, *args):
 	await ctx.send("there is supposed to be a news feeds")
+
+
+@bot.command()
+async def reddit(ctx, sr: regex(antireg="\d|\s",maxlen=21), cnt: int = 5, sortby: text(REDDIT) = "day"):
+	cnt = min(max(1, cnt),15)
+	if sr.startswith('r/'): sr = sr[2:]
+	link = f'https://reddit.com/r/{sr}/top.json?sort=top&t={sortby}&limit={cnt}'
+	message = await web_bot.web_reddit(link)
+	await ctx.send(embed = message)
+
+
+@reddit.error
+async def reddit_error(ctx, error):
+	if isinstance(error, commands.BadArgument):
+		await ctx.send('**.reddit** Accepts 3 arguments: *subreddit*, *number of posts* (opt) and *sort by "hour/day/week/month/year/all"* (opt)')
 
 
 keep_alive()
