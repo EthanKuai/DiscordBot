@@ -40,12 +40,12 @@ class web_crawler:
 			else:
 				index = ss[:max(-1,maxlen+6)].find("](http")
 				if index != -1:
-					out += ss[:index + ss[index:].find(")")]
+					out += ss[:index + 1 + ss[index:].find(")")]
+					maxlen = 0
 				else: out += ss[:maxlen]
 				break
-		if maxlen >= -1: out = out[:-1]
-		else: out = out[:-3] + "..."
-		return out.replace("  "," ")
+		if maxlen < -1: out = out[:-3] + "..."
+		return out.strip().replace("  "," ")
 
 	async def view_links(self):
 		messages = []
