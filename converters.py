@@ -33,7 +33,8 @@ class regex(commands.Converter):
 	async def convert(self, ctx, arg):
 		arg = arg.lower()
 		if len(arg) > self.maxlen: pass
-		elif self.antireg != "" and re.search(self.antireg, arg) == None: pass
-		elif self.reg != "" and re.search(self.reg, arg) != None: pass
+		elif len(arg) == 0: pass
+		elif self.antireg != "" and re.search(self.antireg, arg) != None: pass
+		elif self.reg != "" and re.search(self.reg, arg) == None: pass
 		else: return arg
 		raise commands.BadArgument(f'Unrecognised text: <{arg}>')

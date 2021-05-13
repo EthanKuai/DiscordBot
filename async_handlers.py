@@ -50,8 +50,9 @@ class web_crawler:
 	async def view_links(self):
 		messages = []
 		for link in self.db.LINKS:
-			if link.startswith("https://www.reddit.com"): messages.append(await self.web_reddit(link))
+			if link.startswith("https://www.reddit.com"): out = await self.web_reddit(link)
 			else: print(f'handler.read_link: link "{link}" does not match any known APIs!')
+			for m in out: messages.append(m)
 		return messages
 
 	async def web_json(self, url: str):
@@ -63,6 +64,8 @@ class web_crawler:
 		data = await self.web_json(link)
 		data = json.loads(data.decode('utf-8'))['data']['children']
 		description = ""
+		sr = data[0]['data']['subreddit_name_prefixed']
+		lst = [discord.Embed(title=f"Reddit's top today: {sr}", colour=discord.Colour.orange())]
 
 		for i in data:
 			link = "https://reddit.com" + i['data']['permalink'].strip()
@@ -71,15 +74,15 @@ class web_crawler:
 			author = self.trim(i['data']['author'], 27)
 			title = "**"+self.trim(i['data']['title'])+"**"
 			desc = self.trim(i['data']['selftext'])
-			subreddit = i['data']['subreddit_name_prefixed']
 
-			description += f'[{title}]({link})\n'
-			if desc != '': description += f'{desc}\n'
-			description += f'Score: {score} Comments: {comments} Author: {author}\n\n'
-
-		message = discord.Embed(title=f"Reddit's top today: {subreddit}",\
-			description = description.strip(), colour=discord.Colour(0x3e038c))
-		return message
+			tmp = f'[{title}]({link})\n'
+			if desc != '': tmp += f'{desc}\n'
+			tmp += f'Score: {score} Comments: {comments} Author: {author}\n\n'
+			if len(description) + len(tmp) > 1900:
+				lst.append(discord.Embed(colour=discord.Colour.orange(), description = tmp))
+			else:
+				lst[-1].description += tmp
+		return lst
 
 
 class MyCog(commands.Cog):

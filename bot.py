@@ -198,8 +198,8 @@ async def reddit(ctx, sr: regex(antireg="\d|\s",maxlen=21), cnt: int = 5, sortby
 	cnt = min(max(1, cnt),15)
 	if sr.startswith('r/'): sr = sr[2:]
 	link = f'https://reddit.com/r/{sr}/top.json?sort=top&t={sortby}&limit={cnt}'
-	message = await web_bot.web_reddit(link)
-	await ctx.send(embed = message)
+	messages = await web_bot.web_reddit(link)
+	for m in messages: await ctx.send(embed = m)
 
 
 @reddit.error
