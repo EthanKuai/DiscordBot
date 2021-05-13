@@ -3,12 +3,13 @@ import discord
 from discord.ext import commands, tasks
 
 
+from datetime import datetime, timezone, timedelta
 import asyncpg
 import asyncio
 import aiohttp
 import json
 import os
-from datetime import datetime, timezone, timedelta
+import re
 
 
 class web_crawler:
@@ -22,7 +23,7 @@ class web_crawler:
 	def trim(self, s: str, maxlen: int = -1):
 		if maxlen == -1: maxlen = self.MAX_CHAR # not allowed in header :(
 		out = ''
-		s = s.strip().split(';\n')
+		s = re.split(';\n', s.strip())
 		for ss in s:
 			ss = ss.strip()
 			if ss == '' or ss == '&gt' or ss == '&amp': continue # reddit formatting
