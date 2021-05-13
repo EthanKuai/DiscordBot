@@ -63,9 +63,9 @@ class web_crawler:
 	async def web_reddit(self, link: str):
 		data = await self.web_json(link)
 		data = json.loads(data.decode('utf-8'))['data']['children']
-		description = ""
 		sr = data[0]['data']['subreddit_name_prefixed']
-		lst = [discord.Embed(title=f"Reddit's top today: {sr}", colour=discord.Colour.orange())]
+		lst = [discord.Embed(title=f"Reddit's top today: {sr}",\
+			description = "", colour=discord.Colour.orange())]
 
 		for i in data:
 			link = "https://reddit.com" + i['data']['permalink'].strip()
@@ -78,7 +78,8 @@ class web_crawler:
 			tmp = f'[{title}]({link})\n'
 			if desc != '': tmp += f'{desc}\n'
 			tmp += f'Score: {score} Comments: {comments} Author: {author}\n\n'
-			if len(description) + len(tmp) > 1900:
+			if len(lst[-1].description) + len(tmp) > 1900:
+				lst[-1].description = lst[-1].description.strip()
 				lst.append(discord.Embed(colour=discord.Colour.orange(), description = tmp))
 			else:
 				lst[-1].description += tmp

@@ -195,7 +195,7 @@ async def gnews(ctx, *args):
 
 @bot.command()
 async def reddit(ctx, sr: regex(antireg="\d|\s",maxlen=21), cnt: int = 5, sortby: text(REDDIT) = "day"):
-	cnt = min(max(1, cnt),15)
+	cnt = min(max(1, cnt),20)
 	if sr.startswith('r/'): sr = sr[2:]
 	link = f'https://reddit.com/r/{sr}/top.json?sort=top&t={sortby}&limit={cnt}'
 	messages = await web_bot.web_reddit(link)
