@@ -9,23 +9,16 @@ class db_accessor:
 		self.DB_LST = []
 		try:
 			for i in self.ENV_LST:
-				eval(f'self.{i} = os.environ["{i}"]')
-				if eval(i).isnumeric(): i = int(i)
+				exec(f'self.{i} = os.environ["{i}"]')
+				if eval(f'self.{i}').isnumeric(): exec(f'self.{i} = int(self.{i})')
 			for i in self.DB_LST:
-				eval(f'self.{i} = database["{i}"]')
-				if eval(i).isnumeric(): i = int(i)
+				exec(f'self.{i} = database["{i}"]')
+				if eval(f'self.{i}').isnumeric(): exec(f'self.{i} = int(self.{i})')
 		except:
 			print("db.__init__: Failed to read environmental variables & database")
 			exit()
 		self.TZ = timezone(timedelta(hours=self.TZ_OFFSET))
 		self.read_links()
-		self.initialise() #temporary, shifting stuff to replit database
-
-	def initialise(self): # temporary, shifting stuff to replit database
-		database['LINK_CNT'] = os.environ['LINK_CNT']
-		tmp = int(os.environ['LINK_CNT'])
-		for i in range(tmp):
-			database[f'LINK{i}'] = os.environ[f'LINK{i}']
 
 	def read_links(self):
 		try:
@@ -51,7 +44,7 @@ class db_accessor:
 		try:
 			self.TZ = timezone(timedelta(hours=self.TZ_OFFSET))
 			for i in self.ENV_LST:
-				os.environ[i] = str(eval(f'self.{i}'))
+				os.environ[i] = str(exec(f'self.{i}'))
 		except:
 			print("db.update_data: Failed to update environmental variables")
 			exit()
