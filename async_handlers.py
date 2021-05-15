@@ -3,6 +3,7 @@ from discord.ext import commands, tasks
 from database import db_accessor
 
 
+from send import *
 from datetime import datetime
 import wikipediaapi as wikiapi
 import asyncpg
@@ -10,7 +11,6 @@ import asyncio
 import aiohttp
 import requests
 import json
-import re
 
 
 class web_crawler:
@@ -19,38 +19,7 @@ class web_crawler:
 		self.loop = asyncio.get_event_loop()
 		self.client = aiohttp.ClientSession(loop=self.loop)
 		self.wiki = wikiapi.Wikipedia('en')
-		self.MAX_CHAR = 170
-		self.TRIM = [("*",""),("`",""),(">>> ",""),("  "," "),(" _"," "),("_ "," ")]
 		self.QUOTES = []
-
-	# trims string to fit maxlen, removes special symbols, accounts for hyperlinks
-	def trim(self, s: str, maxlen: int = -1):
-		if maxlen == -1: maxlen = self.MAX_CHAR # not allowed in header :(
-		out = ''
-		for i in self.TRIM: s = s.replace(i[0],i[1])
-		s = re.split(';|\n', s.strip())
-		for ss in s:
-			if maxlen < 0:
-				print('theres something wrong!!!')
-				exit()
-			ss = ss.strip()
-			if ss == '' or ss == '&gt' or ss == '&amp': continue # reddit formatting
-			if ss[0] == '#' and len(ss) == 6: continue # color code
-			maxlen -= len(ss) + 1
-			if maxlen >= -1:
-				out += ss + ' '
-			elif maxlen > -7:
-				out += ss[:maxlen]
-				break
-			else:
-				index = ss[:max(-1,maxlen+6)].find("](http")
-				if index != -1:
-					out += ss[:index + 1 + ss[index:].find(")")]
-					maxlen = 0
-				else: out += ss[:maxlen]
-				break
-		if maxlen < -1: out = out[:-3] + "..."
-		return out.strip().replace("  "," ")
 
 	# scans through links in database, if known API reads & outputs message
 	async def view_links(self):
@@ -79,9 +48,9 @@ class web_crawler:
 			link = "https://reddit.com" + i['data']['permalink'].strip()
 			score = i['data']['score']
 			comments = i['data']['num_comments']
-			author = self.trim(i['data']['author'], 27)
-			title = "**"+self.trim(i['data']['title'])+"**"
-			desc = self.trim(i['data']['selftext'])
+			author = trim(i['data']['author'], 27)
+			title = "**"+trim(i['data']['title'])+"**"
+			desc = trim(i['data']['selftext'])
 
 			tmp = f'[{title}]({link})\n'
 			if desc != '': tmp += f'{desc}\n'
@@ -106,7 +75,7 @@ class web_crawler:
 
 		for i in range(abs(cnt)):
 			tmp = self.QUOTES.pop()
-			out += '*"' + self.trim(tmp['q']) + '"* - **' + self.trim(tmp['a']) + '**\n'
+			out += '*"' + trim(tmp['q']) + '"* - **' + trim(tmp['a']) + '**\n'
 		return out
 
 	# wikipedia API: https://wikipedia-api.readthedocs.io/en/latest/README.html
@@ -117,7 +86,7 @@ class web_crawler:
 			return f'Wikipedia page "{search}" does not exist!'
 		if full: desc = page.text
 		else: desc = f'{page.summary[:200]}\n\n[More information]({page.fullurl})'
-		out = Embed(title=page.title, description = self.trim(desc, 1900), colour=Colour.light_grey())
+		out = Embed(title=page.title, description = trim(desc, 1900), colour=Colour.light_grey())
 		return out
 
 

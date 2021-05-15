@@ -6,12 +6,12 @@ from keep_alive import keep_alive
 from async_handlers import *
 from converters import *
 from database import db_accessor
+from send import *
 import json
 import random
 import typing
 
 
-MAX_LEN = 1950
 DESC = "Hi I am Pseudo, a personal discord bot. Currently in development."
 QUOTE_DAILY = {"today":-1,"daily":-1,"qotd":-1,"day":-1}
 REDDIT = {"now":"now", "hour":"hour", "day":"day", "daily":"day", "today":"day", "week":"week", "month":"month", "year":"year", "all":"all", "alltime":"all", "overall":"all"}
@@ -23,21 +23,6 @@ help_dict = json.load(open('help.json',))
 db = db_accessor()
 web_bot = web_crawler(db)
 my_cog = MyCog(bot, web_bot, db)
-
-
-# print command
-async def p(ctx,out):
-	response = out.split("\n")
-	for line in response:
-		line = line.strip()
-		if len(line) == 0: continue
-		elif len(line) < MAX_LEN:
-			await ctx.send(line)
-		else:
-			i = 0
-			while i < len(line):
-				await ctx.send(line[i: i + MAX_LEN])
-				i += MAX_LEN
 
 
 @bot.command()
