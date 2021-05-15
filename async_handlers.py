@@ -7,17 +7,19 @@ from datetime import datetime, timezone, timedelta
 import asyncpg
 import asyncio
 import aiohttp
+import requests
 import json
 import re
 
 
 class web_crawler:
 	def __init__(self, db: db_accessor):
-		self.MAX_CHAR = 170
 		self.db = db
 		self.loop = asyncio.get_event_loop()
 		self.client = aiohttp.ClientSession(loop=self.loop)
+		self.MAX_CHAR = 170
 		self.TRIM = [("*",""),("`",""),(">>> ",""),("  "," "),(" _"," "),("_ "," ")]
+		self.QUOTES = []
 
 	def trim(self, s: str, maxlen: int = -1):
 		if maxlen == -1: maxlen = self.MAX_CHAR # not allowed in header :(
@@ -84,6 +86,20 @@ class web_crawler:
 			else:
 				lst[-1].description += tmp
 		return lst
+
+	async def web_quote(self, cnt: int):
+		out = ""; cnt = min(cnt,15)
+		if cnt==-1: # daily quote
+			response = requests.get("https://zenquotes.io/api/today")
+			self.QUOTES += json.loads(response.text)
+		elif len(self.QUOTES) < cnt:
+			response = requests.get("https://zenquotes.io/api/quotes")
+			self.QUOTES += json.loads(response.text)
+
+		for i in range(abs(cnt)):
+			tmp = self.QUOTES.pop()
+			out += '*"' + self.trim(tmp['q']) + '"* - **' + self.trim(tmp['a']) + '**\n'
+		return out
 
 
 class MyCog(commands.Cog):

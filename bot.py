@@ -14,7 +14,6 @@ import typing
 
 MAX_LEN = 1950
 DESC = "Hi I am Pseudo, a personal discord bot. Currently in development."
-QUOTES = []
 QUOTE_DAILY = {"today":-1,"daily":-1,"qotd":-1,"day":-1}
 REDDIT = {"now":"now", "hour":"hour", "day":"day", "daily":"day", "today":"day", "week":"week", "month":"month", "year":"year", "all":"all", "alltime":"all", "overall":"all"}
 
@@ -68,22 +67,9 @@ async def helpp(ctx):
 
 @bot.command()
 async def quote(ctx, cnt: text_or_int(QUOTE_DAILY) = 1):
-	if cnt==-1: # daily quote
-		response = requests.get("https://zenquotes.io/api/today")
-		json_tmp = json.loads(response.text)
-		quote = "*\"" + json_tmp[0]['q'].strip() + "\"* - **" + json_tmp[0]['a'].strip() + "**"
-		await ctx.send("**Quote of the day**: " + quote)
-	else: # normal quote
-		global QUOTES
-		cnt = min(cnt,25)
-		if len(QUOTES) < cnt:
-			response = requests.get("https://zenquotes.io/api/quotes")
-			QUOTES += json.loads(response.text)
-
-		for i in range(cnt):
-			quote = "*\"" + QUOTES[-1]['q'].strip() + "\"* - **" + QUOTES[-1]['a'].strip() + "**"
-			QUOTES.pop()
-			await ctx.send(quote)
+	out = web_bot.web_quote(cnt)
+	if cnt == -1: out = "**Quote of the day**: " + out
+	await p(ctx, out)
 
 
 @quote.error
