@@ -6,7 +6,6 @@ from keep_alive import keep_alive
 from async_handlers import *
 from converters import *
 from database import db_accessor
-import requests
 import json
 import random
 import typing

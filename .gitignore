@@ -1,4 +1,5 @@
 # stuff to ignore
+.replit
 err.log
 depreciated/
 poetry.lock
