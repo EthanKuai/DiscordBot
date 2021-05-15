@@ -2,26 +2,17 @@ from discord.ext import commands
 import re
 
 class text_or_int(commands.Converter):
-	def __init__(self, textout, lst_text):
-		self.textout = textout # returned when an accepted text
-		self.lst_text = lst_text # list of accepted text
+	def __init__(self, text: dict, accept_int: bool = True):
+		self.text = text # dict of accepted text
+		self.accept_int = accept_int
 
 	async def convert(self, ctx, arg):
 		arg = arg.lower()
-		if arg.isnumeric(): return int(arg)
-		elif arg in self.lst_text: return self.textout
+		if self.accept_int and arg.isnumeric():
+			return int(arg)
+		if arg in self.text:
+			return self.text[arg]
 		else: raise commands.BadArgument(f'Neither integer nor recognised text: <{arg}>')
-
-
-class text(commands.Converter):
-	def __init__(self, dict):
-		self.dict = dict # dict of accepted text
-
-	async def convert(self, ctx, arg):
-		arg = arg.lower()
-		if arg in self.dict:
-			return self.dict[arg]
-		else: raise commands.BadArgument(f'Unrecognised text: <{arg}>')
 
 
 class regex(commands.Converter):

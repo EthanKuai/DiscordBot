@@ -15,7 +15,7 @@ import typing
 MAX_LEN = 1950
 DESC = "Hi I am Pseudo, a personal discord bot. Currently in development."
 QUOTES = []
-QUOTE_DAILY = ["today","daily","qotd","day"]
+QUOTE_DAILY = {"today":-1,"daily":-1,"qotd":-1,"day":-1}
 REDDIT = {"now":"now", "hour":"hour", "day":"day", "daily":"day", "today":"day", "week":"week", "month":"month", "year":"year", "all":"all", "alltime":"all", "overall":"all"}
 
 intents = discord.Intents.default()
@@ -67,7 +67,7 @@ async def helpp(ctx):
 
 
 @bot.command()
-async def quote(ctx, cnt: text_or_int(-1, QUOTE_DAILY) = 1):
+async def quote(ctx, cnt: text_or_int(QUOTE_DAILY) = 1):
 	if cnt==-1: # daily quote
 		response = requests.get("https://zenquotes.io/api/today")
 		json_tmp = json.loads(response.text)
@@ -198,10 +198,12 @@ async def gnews(ctx, *args):
 
 
 @bot.command()
-async def reddit(ctx, sr: regex(antireg="\d|\s",maxlen=21), cnt: int = 5, sortby: text(REDDIT) = "day"):
+async def reddit(ctx, sr: regex(antireg="\d|\s",maxlen=21), cnt: text_or_int(REDDIT) = 5, sortby: text_or_int(REDDIT, 0) = "day"):
+	if isinstance(cnt, str):
+		sortby = cnt; cnt = 5
 	cnt = min(max(1, cnt),20)
-	if sr.startswith('r/'): sr = sr[2:]
-	link = f'https://reddit.com/r/{sr}/top.json?sort=top&t={sortby}&limit={cnt}'
+	if sr != "top": sr = 'r/' + sr
+	link = f'https://reddit.com/{sr}/top.json?sort=top&t={sortby}&limit={cnt}'
 	messages = await web_bot.web_reddit(link)
 	for m in messages: await ctx.send(embed = m)
 
@@ -209,7 +211,7 @@ async def reddit(ctx, sr: regex(antireg="\d|\s",maxlen=21), cnt: int = 5, sortby
 @reddit.error
 async def reddit_error(ctx, error):
 	if isinstance(error, commands.BadArgument):
-		await ctx.send('**.reddit** Accepts 3 arguments: *subreddit*, *number of posts* (opt) and *sort by "hour/day/week/month/year/all"* (opt)')
+		await ctx.send('**.reddit** Accepts 3 arguments: *subreddit*, *number of posts* (opt) and *sort by "hour/day/week/month/year/all"* (opt)\nSpecial argument: "top" as subreddit for overall top posts.')
 
 
 keep_alive()
