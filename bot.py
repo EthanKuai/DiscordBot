@@ -13,8 +13,9 @@ import typing
 
 
 DESC = "Hi I am Pseudo, a personal discord bot. Currently in development."
-QUOTE_DAILY = {"today":-1,"daily":-1,"qotd":-1,"day":-1}
+QUOTE_DAILY = {"today":-1, "daily":-1, "qotd":-1, "day":-1}
 REDDIT = {"now":"now", "hour":"hour", "day":"day", "daily":"day", "today":"day", "week":"week", "month":"month", "year":"year", "all":"all", "alltime":"all", "overall":"all"}
+WIKI = {"short":False, "summary":False, "full":True, "all":True}
 
 intents = discord.Intents.default()
 intents.members = True
@@ -24,6 +25,7 @@ db = db_accessor()
 web_bot = web_crawler(db)
 my_cog = MyCog(bot, web_bot, db)
 
+# https://docs.python.org/3/library/logging.html#module-logging
 logger = logging.getLogger('discord')
 logger.setLevel(logging.DEBUG)
 handler = logging.FileHandler(filename='err.log', encoding='utf-8', mode='w')
@@ -57,7 +59,7 @@ async def helpp(ctx):
 
 @bot.command()
 async def quote(ctx, cnt: text_or_int(QUOTE_DAILY) = 1):
-	out = web_bot.web_quote(cnt)
+	out = await web_bot.web_quote(cnt)
 	if cnt == -1: out = "**Quote of the day**: " + out
 	await p(ctx, out)
 
@@ -185,6 +187,11 @@ async def reddit(ctx, sr: regex(antireg="\d|\s",maxlen=21), cnt: text_or_int(RED
 async def reddit_error(ctx, error):
 	if isinstance(error, commands.BadArgument):
 		await ctx.send('**.reddit** Accepts 3 arguments: *subreddit*, *number of posts* (opt) and *sort by "hour/day/week/month/year/all"* (opt)\nSpecial argument: "top" as subreddit for overall top posts.')
+
+
+@bot.command()
+async def wiki(ctx, search: str, full: text_or_int(WIKI,0)=False):
+	await p(ctx, await web_bot.web_wiki(search, full))
 
 
 keep_alive()
