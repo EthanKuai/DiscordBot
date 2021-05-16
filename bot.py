@@ -24,6 +24,12 @@ db = db_accessor()
 web_bot = web_crawler(db)
 my_cog = MyCog(bot, web_bot, db)
 
+logger = logging.getLogger('discord')
+logger.setLevel(logging.DEBUG)
+handler = logging.FileHandler(filename='err.log', encoding='utf-8', mode='w')
+handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+logger.addHandler(handler)
+
 
 @bot.command()
 async def echo(ctx,cnt: typing.Optional[int] = 1,*,response):
