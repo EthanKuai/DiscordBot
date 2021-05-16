@@ -7,6 +7,7 @@ TRIM = [("*",""),("`",""),(">>> ",""),("  "," "),(" _"," "),("_ "," ")] # .repla
 
 # sends list of message to ctx (context)
 async def p(ctx, messages, keyword: str = "\n"):
+	if isinstance(messages, str): messages = [messages]
 	for m in messages:
 		if isinstance(m, Embed): # embed message
 			await ctx.send(embed = m)
