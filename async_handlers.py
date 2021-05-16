@@ -105,11 +105,9 @@ class MyCog(commands.Cog):
 		async with self.lock:
 			if ctx == None:
 				ctx = self.bot.get_guild(self.db.GUILD_ID).get_channel(self.db.DAILY_CHANNEL)
-			await ctx.send("Your daily briefing up and coming!")
-			messages = await self.web_bot.view_links()
-			for m in messages:
-				if isinstance(m, Embed): await ctx.send(embed = m)
-				else: await ctx.send(m)
+			out = ["Your daily briefing up and coming!"]
+			out += await self.web_bot.view_links()
+			await p(ctx, out)
 
 	# reads set-time for daily briefing, waits for that time
 	@daily_briefing.before_loop
@@ -118,10 +116,10 @@ class MyCog(commands.Cog):
 		await self.bot.wait_until_ready()
 		print('Bot connected, cog now ready!')
 
-		today = datetime.now(tz = self.db.tz)
-		start = datetime(today.year, today.month, today.day, self.db.DAILY_TIME, 0, 0, 0, tzinfo=self.db.tz)
-		delta = int((start-today).total_seconds())
-		if delta < 0: delta += 86400
+		now = datetime.now(tz = self.db.tz)
+		start = datetime(now.year, now.month, now.day, self.db.DAILY_TIME, 0, 0, 0, tzinfo=self.db.tz)
+		delta = int((start-now).total_seconds()) % 86400
+		# waiting seconds > 0, 86400 = days in seconds
 		print(f'cog waiting for {delta} seconds')
 		await asyncio.sleep(delta)
 		print('cog done waiting!')

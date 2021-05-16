@@ -5,22 +5,21 @@ MAX_LEN = 1950 # discord message length
 MAX_PARA = 170 # paragraph max len
 TRIM = [("*",""),("`",""),(">>> ",""),("  "," "),(" _"," "),("_ "," ")] # .replace() in trim()
 
-# sends message to ctx (context)
-async def p(ctx, out):
-	if isinstance(out, Embed):
-		await ctx.send(embed = out)
-	else:
-		response = out.split("\n")
-		for line in response:
+# sends list of message to ctx (context)
+async def p(ctx, messages, keyword: str = "\n"):
+	for m in messages:
+		if isinstance(m, Embed): # embed message
+			await ctx.send(embed = m)
+			continue
+		for line in m.split(keyword): # split by keyword
 			line = line.strip()
-			if len(line) == 0: continue
-			elif len(line) < MAX_LEN:
+			if line == "": # empty line
+				continue
+			elif len(line) < MAX_LEN: # short line
 				await ctx.send(line)
-			else:
-				i = 0
-				while i < len(line):
-					await ctx.send(line[i: i + MAX_LEN])
-					i += MAX_LEN
+				continue
+			for i in range(0, len(line)+MAX_LEN-1, MAX_LEN): # long line
+				await ctx.send(line[i: i + MAX_LEN])
 
 # trims string to fit maxlen, removes special symbols, accounts for hyperlinks
 def trim(s: str, maxlen: int = MAX_PARA):

@@ -66,14 +66,13 @@ async def quote_error(ctx, error):
 async def coin(ctx, cnt: typing.Optional[int] = 1):
 	message = ""
 	total = 0
-	cnt = min(cnt,MAX_LEN)
 
 	if cnt < 100:
-		yes = "yes "
-		no = "no "
+		yes = "yes "; no = "no "
+	elif cnt < MAX_LEN:
+		yes = "1 "; no = "0 "
 	else:
-		yes = "1 "
-		no = "0 "
+		yes = ""; no = ""
 
 	for i in range(cnt):
 		if random.randint(0,1):
@@ -89,8 +88,6 @@ async def coin(ctx, cnt: typing.Optional[int] = 1):
 async def rng(ctx, maxn: int, cnt: typing.Optional[int] = 1):
 	message = ""
 	total = 0
-	cnt = min(max(1, cnt),MAX_LEN)
-	maxn = max(1, maxn)
 
 	for i in range(cnt):
 		tmp = random.randint(0,maxn)
