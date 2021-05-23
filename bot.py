@@ -20,6 +20,7 @@ WIKI = {"short":False, "summary":False, "full":True, "all":True}
 intents = discord.Intents.default()
 intents.members = True
 bot = commands.Bot(command_prefix = '.', description = DESC, intents = intents)
+bot.remove_command('help')
 help_dict = json.load(open('help.json',))
 db = db_accessor()
 web_bot = web_crawler(db)
@@ -49,7 +50,7 @@ async def _embed(ctx,*,arg):
 
 
 @bot.command()
-async def helpp(ctx):
+async def help(ctx):
 	message = "**^ represents an optional argument**\n\n"
 	for i, (command, description) in enumerate(help_dict.items()):
 		message += "```" + command + "``` >> " + description + "\n\n"
@@ -180,7 +181,7 @@ async def reddit(ctx, sr: regex(antireg="\d|\s",maxlen=21), cnt: text_or_int(RED
 	if sr != "top": sr = 'r/' + sr
 	link = f'https://reddit.com/{sr}/top.json?sort=top&t={sortby}&limit={cnt}'
 	messages = await web_bot.web_reddit(link)
-	for m in messages: await ctx.send(embed = m)
+	await p(ctx, messages)
 
 
 @reddit.error

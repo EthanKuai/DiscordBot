@@ -1,4 +1,4 @@
-from discord import Embed, Color
+import discord
 from discord.ext import commands, tasks
 from database import db_accessor
 
@@ -18,7 +18,7 @@ class web_crawler:
 		self.db = db
 		self.loop = asyncio.get_event_loop()
 		self.client = aiohttp.ClientSession(loop=self.loop)
-		self.wiki = wikiapi.Wikipedia('en')
+		self.wiki = wikiapi.Wikipedia(langauge='en', extract_format=wikiapi.ExtractFormat.WIKI)
 		self.QUOTES = []
 
 	# scans through links in database, if known API reads & outputs message
@@ -39,10 +39,11 @@ class web_crawler:
 
 	# reddit API, returns embed messages
 	async def web_reddit(self, link: str):
-		data = await self.web_json(link)['data']['children']
+		data = await self.web_json(link)
+		data = data['data']['children']
 		sr = data[0]['data']['subreddit_name_prefixed']
-		lst = [Embed(title=f"Reddit's top today: {sr}",\
-			description = "", colour=Colour.orange())]
+		lst = [discord.Embed(title=f"Reddit's top today: {sr}",\
+			description = "", colour=discord.Colour.orange())]
 
 		for i in data:
 			link = "https://reddit.com" + i['data']['permalink'].strip()
@@ -57,20 +58,19 @@ class web_crawler:
 			tmp += f'Score: {score} Comments: {comments} Author: {author}\n\n'
 			if len(lst[-1].description) + len(tmp) > 1900:
 				lst[-1].description = lst[-1].description.strip()
-				lst.append(Embed(colour=Colour.orange(), description = tmp))
+				lst.append(discord.Embed(colour=discord.Colour.orange(), description = tmp))
 			else:
 				lst[-1].description += tmp
 		return lst
 
 	# zenquotes API, returns str of quotes: https://premium.zenquotes.io/zenquotes-documentation/
 	async def web_quote(self, cnt: int):
-		print(self.web_json("https://zenquotes.io/api/quotes"))
 		out = ""; cnt = min(cnt,15)
 		if cnt==-1: # daily quote
-			response = requests.get("https://zenquotes.io/api/today")
+			response = await self.web_json("https://zenquotes.io/api/today")
 			self.QUOTES += json.loads(response.text)
 		elif len(self.QUOTES) < cnt:
-			response = requests.get("https://zenquotes.io/api/quotes")
+			response = await self.web_json("https://zenquotes.io/api/quotes")
 			self.QUOTES += json.loads(response.text)
 
 		for i in range(abs(cnt)):
@@ -81,12 +81,12 @@ class web_crawler:
 	# wikipedia API: https://wikipedia-api.readthedocs.io/en/latest/README.html
 	async def web_wiki(self, search: str, full: bool = False):
 		search = search.replace(" ", "_")
-		page = self.wiki.page(search, extract_format=wikiapi.ExtractFormat.WIKI)
+		page = self.wiki.page(search)
 		if not page.exists():
 			return f'Wikipedia page "{search}" does not exist!'
 		if full: desc = page.text
 		else: desc = f'{page.summary[:200]}\n\n[More information]({page.fullurl})'
-		out = Embed(title=page.title, description = trim(desc, 1900), colour=Colour.light_grey())
+		out = discord.Embed(title=page.title, description = trim(desc, 1900), colour=discord.Colour.light_grey())
 		return out
 
 

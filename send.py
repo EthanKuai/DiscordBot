@@ -1,4 +1,4 @@
-from discord import Embed
+import discord
 import re
 
 MAX_LEN = 1950 # discord message length
@@ -9,7 +9,7 @@ TRIM = [("*",""),("`",""),(">>> ",""),("  "," "),(" _"," "),("_ "," ")] # .repla
 async def p(ctx, messages, keyword: str = "\n"):
 	if isinstance(messages, str): messages = [messages]
 	for m in messages:
-		if isinstance(m, Embed): # embed message
+		if isinstance(m, discord.Embed): # embed message
 			await ctx.send(embed = m)
 			continue
 		for line in m.split(keyword): # split by keyword

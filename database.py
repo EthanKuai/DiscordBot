@@ -5,7 +5,7 @@ from datetime import timezone, timedelta
 
 class db_accessor:
 	def __init__(self):
-		self.ENV_LST = ['TOKEN','GUILD_ID','DAILY_CHANNEL','DAILY_TIME','TZ_OFFSET']
+		self.ENV_LST = ['TOKEN','GUILD_ID','DAILY_CHANNEL','DAILY_TIME','TZ_OFFSET','KEY_GOOGLE']
 		self.DB_LST = []
 		try:
 			for i in self.ENV_LST:
