@@ -1,13 +1,13 @@
 import discord
 import re
 
-MAX_LEN = 1950 # discord message length
+MAX_LEN = 1900 # discord message length
 MAX_PARA = 170 # paragraph max len
-TRIM = [("*",""),("`",""),(">>> ",""),("  "," "),(" _"," "),("_ "," ")] # .replace() in trim()
+TRIM = [("*",""),("`",""),(">>> ",""),("%20"," "),("_"," "),("   "," "),("  "," ")] # .replace() in trim()
 
 # sends list of message to ctx (context)
 async def p(ctx, messages, keyword: str = "\n"):
-	if isinstance(messages, str): messages = [messages]
+	if not isinstance(messages, list): messages = [messages]
 	for m in messages:
 		if isinstance(m, discord.Embed): # embed message
 			await ctx.send(embed = m)

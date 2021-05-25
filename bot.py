@@ -16,22 +16,32 @@ DESC = "Hi I am Pseudo, a personal discord bot. Currently in development."
 QUOTE_DAILY = {"today":-1, "daily":-1, "qotd":-1, "day":-1}
 REDDIT = {"now":"now", "hour":"hour", "day":"day", "daily":"day", "today":"day", "week":"week", "month":"month", "year":"year", "all":"all", "alltime":"all", "overall":"all"}
 WIKI = {"short":False, "summary":False, "full":True, "all":True}
+EXTENSIONS = ['async_handlers']
 
 intents = discord.Intents.default()
 intents.members = True
-bot = commands.Bot(command_prefix = '.', description = DESC, intents = intents)
+bot = commands.Bot(command_prefix='.', description=DESC, intents=intents, case_insensitive=True)
 bot.remove_command('help')
+for i in EXTENSIONS: bot.load_extension(i)
 help_dict = json.load(open('help.json',))
 db = db_accessor()
 web_bot = web_crawler(db)
 my_cog = MyCog(bot, web_bot, db)
 
 # https://docs.python.org/3/library/logging.html#module-logging
+# https://docs.python.org/3/howto/logging.html#logging-basic-tutorial
 logger = logging.getLogger('discord')
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.ERROR) #INFO, DEBUG, ERROR, WARNING, CRITICAL
 handler = logging.FileHandler(filename='err.log', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
+
+
+@bot.event
+# When bot is ready
+async def on_ready():
+	print('connected!')
+    print(bot.user)
 
 
 @bot.command()
@@ -147,6 +157,15 @@ async def _info(ctx):
 async def _eval(ctx, *, arg):
 	try:
 		await ctx.send(eval(arg))
+	except:
+		await ctx.send("failed.")
+
+
+@bot.command()
+@commands.is_owner()
+async def _exec(ctx, *, arg):
+	try:
+		await ctx.send(exec(arg))
 	except:
 		await ctx.send("failed.")
 

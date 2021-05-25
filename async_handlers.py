@@ -5,7 +5,6 @@ from database import db_accessor
 
 from send import *
 from datetime import datetime
-import wikipediaapi as wikiapi
 import asyncpg
 import asyncio
 import aiohttp
@@ -18,7 +17,7 @@ class web_crawler:
 		self.db = db
 		self.loop = asyncio.get_event_loop()
 		self.client = aiohttp.ClientSession(loop=self.loop)
-		self.wiki = wikiapi.Wikipedia(langauge='en', extract_format=wikiapi.ExtractFormat.WIKI)
+		self.session = requests.Session()
 		self.QUOTES = []
 
 	# scans through links in database, if known API reads & outputs message
@@ -30,12 +29,16 @@ class web_crawler:
 			for m in out: messages.append(m)
 		return messages
 
-	# reads & returns json of url
-	async def web_json(self, url: str):
-		async with self.client.get(url) as response:
-			assert response.status == 200
-			data = await response.read()
-			return json.loads(data.decode('utf-8'))
+	# reads & returns json of url [aiohttp no params/requests with params]
+	async def web_json(self, url: str, params = -1):
+		if params == -1:
+			async with self.client.get(url) as response:
+				assert response.status == 200
+				data = await response.read()
+				return json.loads(data.decode('utf-8'))
+		else:
+			data = self.session.get(url=url, params=params)
+			return data.json()
 
 	# reddit API, returns embed messages
 	async def web_reddit(self, link: str):
@@ -68,26 +71,94 @@ class web_crawler:
 		out = ""; cnt = min(cnt,15)
 		if cnt==-1: # daily quote
 			response = await self.web_json("https://zenquotes.io/api/today")
-			self.QUOTES += json.loads(response.text)
+			self.QUOTES += response
 		elif len(self.QUOTES) < cnt:
 			response = await self.web_json("https://zenquotes.io/api/quotes")
-			self.QUOTES += json.loads(response.text)
+			self.QUOTES += response
 
 		for i in range(abs(cnt)):
 			tmp = self.QUOTES.pop()
 			out += '*"' + trim(tmp['q']) + '"* - **' + trim(tmp['a']) + '**\n'
 		return out
 
-	# wikipedia API: https://wikipedia-api.readthedocs.io/en/latest/README.html
-	async def web_wiki(self, search: str, full: bool = False):
-		search = search.replace(" ", "_")
-		page = self.wiki.page(search)
-		if not page.exists():
-			return f'Wikipedia page "{search}" does not exist!'
-		if full: desc = page.text
-		else: desc = f'{page.summary[:200]}\n\n[More information]({page.fullurl})'
-		out = discord.Embed(title=page.title, description = trim(desc, 1900), colour=discord.Colour.light_grey())
-		return out
+	# formats url to find the REAL one; eg. Google_2015_logo.svg ->
+	# https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/2560px-Google_2015_logo.svg.png
+	def wiki_icon_url(self, url: str, width: int = 0):
+		if url.endswith('.svg'):
+			lst = url.split('/')[-3:] # 3,32,Googleplex_HQ_%28cropped%29.jpg
+			x = f'http://upload.wikimedia.org/wikipedia/commons/thumb/{lst[0]}/{lst[1]}/{lst[2]}/{width}px-{lst[2]}.png'
+		else: x = url
+		return x.replace(' ', '%20')
+
+	# mediawiki API: https://www.mediawiki.org/wiki/API:Properties
+	async def web_wiki(self, search: str, full: bool = False, lang: str = 'en'):
+		embed = discord.Embed(color = discord.Colour.light_grey())
+		api_url = f'https://{lang}.wikipedia.org/w/api.php'
+		# search closest wiki page
+		search = search.replace("_", " ")
+		search_params = {
+			"action": "opensearch",
+			"format": "json",
+			"search": search
+		}
+		search_json = await self.web_json(api_url, search_params)
+		page_title = search_json[1][0] #[1][...] contains all related article title results
+		page_url = search_json[3][0] #[3][...] contains all related article url results
+
+		# retrieving page info
+		info_params = {
+			"action": "query",
+			"format": "json",
+			"titles": page_title, # "titles": "Category:Foo|Category:Infobox templates",
+			"prop": "extracts", # "prop": "categoryinfo",
+			"explaintext": "", # no html formatting
+			"redirects": 1
+		}
+		if not full: info_params["exintro"] = "" # display summary
+		info_json = await self.web_json(api_url, info_params)
+		info_json = info_json['query']['pages']
+		# info_json.keys() has 1 item, being the pageid
+		for i in info_json.keys(): info_json = info_json[i]
+		if not full: extract = trim(info_json['extract']) # summary article
+		else: extract = trim(info_json['extract'], MAX_LEN) # 'full' article
+
+		# retrieving page icon
+		icon_params = {
+			"action": "query",
+			"format": "json",
+			"titles": page_title,
+			"prop": "pageimages",
+			"piprop": "original"
+		}
+		icon_json = await self.web_json(api_url, icon_params)
+		icon_json = icon_json['query']['pages']
+		try:
+			# icon_json.keys() has 1 item, being the pageid
+			for i in icon_json.keys(): icon_json = icon_json[i]['original']
+			icon_url = self.wiki_icon_url(icon_json['source'],icon_json['width'])
+			embed.set_thumbnail(url=icon_url)
+		except: icon_url = ""
+
+		# retrieving 1-liner description
+		one_params = {
+			"action": "query",
+			"format": "json",
+			"titles": page_title,
+			"prop": "pageprops"
+		}
+		one_json = await self.web_json(api_url, one_params)
+		one_json = one_json['query']['pages']
+		try:
+			# one_json.keys() has 1 item, being the pageid
+			for i in one_json.keys(): one_json = one_json[i]['pageprops']
+			one_liner = one_json['wikibase-shortdesc']
+		except: one_liner = ""
+
+		# formatting to message
+		if one_liner == "": desc = f'[**{page_title}**]({page_url})\n{extract}'
+		else: desc = f'[**{page_title}**]({page_url})\n*{one_liner}*\n{extract}'
+		embed.description = desc
+		return embed
 
 
 class MyCog(commands.Cog):
