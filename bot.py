@@ -15,14 +15,13 @@ import typing
 DESC = "Hi I am Pseudo, a personal discord bot. Currently in development."
 QUOTE_DAILY = {"today":-1, "daily":-1, "qotd":-1, "day":-1}
 REDDIT = {"now":"now", "hour":"hour", "day":"day", "daily":"day", "today":"day", "week":"week", "month":"month", "year":"year", "all":"all", "alltime":"all", "overall":"all"}
-WIKI = {"short":False, "summary":False, "full":True, "all":True}
 EXTENSIONS = ['async_handlers']
 
 intents = discord.Intents.default()
 intents.members = True
 bot = commands.Bot(command_prefix='.', description=DESC, intents=intents, case_insensitive=True)
-bot.remove_command('help')
-for i in EXTENSIONS: bot.load_extension(i)
+#bot.remove_command('help')
+#for i in EXTENSIONS: bot.load_extension(i)
 help_dict = json.load(open('help.json',))
 db = db_accessor()
 web_bot = web_crawler(db)
@@ -41,7 +40,7 @@ logger.addHandler(handler)
 # When bot is ready
 async def on_ready():
 	print('connected!')
-    print(bot.user)
+	print(bot.user)
 
 
 @bot.command()
@@ -210,8 +209,17 @@ async def reddit_error(ctx, error):
 
 
 @bot.command()
-async def wiki(ctx, search: str, full: text_or_int(WIKI,0)=False):
-	await p(ctx, await web_bot.web_wiki(search, full))
+async def wiki(ctx, *, search):
+	search = search.split(' ')
+	if search[0] == 'search':
+		out = await web_bot.web_wiki_search(' '.join(search[1:]))
+	elif search[-1] == 'search':
+		out = await web_bot.web_wiki_search(' '.join(search[:-1]))
+	elif search[-1] == 'full':
+		out = await web_bot.web_wiki(' '.join(search[:-1]), True)
+	else:
+		out = await web_bot.web_wiki(' '.join(search))
+	await p(ctx, out)
 
 
 keep_alive()
