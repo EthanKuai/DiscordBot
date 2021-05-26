@@ -1,9 +1,9 @@
 import discord
 from discord.ext import commands, tasks
-from database import db_accessor
 
 
-from send import *
+from bot.database import *
+from bot.send import *
 from datetime import datetime
 import asyncpg
 import asyncio
@@ -45,7 +45,7 @@ class web_crawler:
 		data = await self.web_json(link)
 		data = data['data']['children']
 		sr = data[0]['data']['subreddit_name_prefixed']
-		lst = [discord.Embed(title=f"Reddit's top today: {sr}",\
+		lst = [discord.Embed(title=f"Reddit's top: {sr}",\
 			description = "", colour=discord.Colour.orange())]
 
 		for i in data:
@@ -81,29 +81,38 @@ class web_crawler:
 			out += '*"' + trim(tmp['q']) + '"* - **' + trim(tmp['a']) + '**\n'
 		return out
 
-	# formats url to find the REAL one; eg. Google_2015_logo.svg ->
-	# https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/2560px-Google_2015_logo.svg.png
-	def wiki_icon_url(self, url: str, width: int = 0):
-		if url.endswith('.svg'):
-			lst = url.split('/')[-3:] # 3,32,Googleplex_HQ_%28cropped%29.jpg
-			x = f'http://upload.wikimedia.org/wikipedia/commons/thumb/{lst[0]}/{lst[1]}/{lst[2]}/{width}px-{lst[2]}.png'
-		else: x = url
-		return x.replace(' ', '%20')
-
-	# mediawiki API: https://www.mediawiki.org/wiki/API:Properties
-	async def web_wiki(self, search: str, full: bool = False, lang: str = 'en'):
-		embed = discord.Embed(color = discord.Colour.light_grey())
+	# wiki search results
+	async def web_wiki_search(self, search: str, is_embed: bool = True, lang: str = 'en'):
 		api_url = f'https://{lang}.wikipedia.org/w/api.php'
 		# search closest wiki page
-		search = search.replace("_", " ")
+		search = search.replace("%20", " ").replace("_", " ")
 		search_params = {
 			"action": "opensearch",
 			"format": "json",
 			"search": search
 		}
 		search_json = await self.web_json(api_url, search_params)
-		page_title = search_json[1][0] #[1][...] contains all related article title results
-		page_url = search_json[3][0] #[3][...] contains all related article url results
+		lst = [(search_json[1][i],search_json[3][i]) for i in range(len(search_json[1]))]
+		#[1][...] contains all related article title results
+		#[3][...] contains all related article url results
+		if is_embed:
+			desc = ""
+			for i in range(min(len(lst),10)):
+				desc += f'[**{trim(lst[i][0])}**]({lst[i][1]})\n'
+			embed = discord.Embed(description = desc, color = discord.Colour.light_grey())
+			embed.title = f'Wiki search results for: {search}'
+			return embed
+		else: return lst
+
+	# mediawiki API: https://github.com/mudroljub/wikipedia-api-docs
+	async def web_wiki(self, search: str, full: bool = False, lang: str = 'en'):
+		embed = discord.Embed(color = discord.Colour.light_grey())
+		api_url = f'https://{lang}.wikipedia.org/w/api.php'
+
+		# search closest wiki page
+		results = await self.web_wiki_search(search, False, lang)
+		page_title = results[0][0]
+		page_url = results[0][1]
 
 		# retrieving page info
 		info_params = {
@@ -114,12 +123,12 @@ class web_crawler:
 			"explaintext": "", # no html formatting
 			"redirects": 1
 		}
-		if not full: info_params["exintro"] = "" # display summary
+		if not full: info_params["exintro"] = "1" # display summary
 		info_json = await self.web_json(api_url, info_params)
 		info_json = info_json['query']['pages']
 		# info_json.keys() has 1 item, being the pageid
 		for i in info_json.keys(): info_json = info_json[i]
-		if not full: extract = trim(info_json['extract']) # summary article
+		if not full: extract = trim(info_json['extract'],450) # summary article
 		else: extract = trim(info_json['extract'], MAX_LEN) # 'full' article
 
 		# retrieving page icon
@@ -128,15 +137,16 @@ class web_crawler:
 			"format": "json",
 			"titles": page_title,
 			"prop": "pageimages",
-			"piprop": "original"
+			"pithumbsize": "500"
 		}
 		icon_json = await self.web_json(api_url, icon_params)
 		icon_json = icon_json['query']['pages']
 		try:
 			# icon_json.keys() has 1 item, being the pageid
-			for i in icon_json.keys(): icon_json = icon_json[i]['original']
-			icon_url = self.wiki_icon_url(icon_json['source'],icon_json['width'])
-			embed.set_thumbnail(url=icon_url)
+			for i in icon_json.keys(): icon_json = icon_json[i]
+			icon_url = icon_json['thumbnail']['source']
+			if full: embed.set_image(url=icon_url)
+			else: embed.set_thumbnail(url=icon_url)
 		except: icon_url = ""
 
 		# retrieving 1-liner description

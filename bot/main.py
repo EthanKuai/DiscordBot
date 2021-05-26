@@ -1,27 +1,27 @@
 import discord
 import logging
 from discord.ext import commands
-from keep_alive import keep_alive
+from .keep_alive import keep_alive
 
-from async_handlers import *
-from converters import *
-from database import db_accessor
-from send import *
+from bot import *
+import typing
 import json
 import random
-import typing
 
 
 DESC = "Hi I am Pseudo, a personal discord bot. Currently in development."
 QUOTE_DAILY = {"today":-1, "daily":-1, "qotd":-1, "day":-1}
 REDDIT = {"now":"now", "hour":"hour", "day":"day", "daily":"day", "today":"day", "week":"week", "month":"month", "year":"year", "all":"all", "alltime":"all", "overall":"all"}
-EXTENSIONS = ['async_handlers']
+HELP_COMMAND = commands.DefaultHelpCommand(no_category = 'Utility')
 
 intents = discord.Intents.default()
 intents.members = True
-bot = commands.Bot(command_prefix='.', description=DESC, intents=intents, case_insensitive=True)
+bot = commands.Bot(command_prefix='.', description=DESC, intents=intents,\
+	 case_insensitive=True, help_command = HELP_COMMAND)
+bot_cogs = [owner(bot)]
+if __name__ == '__main__':
+	for cog in bot_cogs: bot.load_extension(cog)
 #bot.remove_command('help')
-#for i in EXTENSIONS: bot.load_extension(i)
 help_dict = json.load(open('help.json',))
 db = db_accessor()
 web_bot = web_crawler(db)
@@ -39,8 +39,10 @@ logger.addHandler(handler)
 @bot.event
 # When bot is ready
 async def on_ready():
+	global bot
 	print('connected!')
-	print(bot.user)
+	await bot.change_presence(game=discord.Game(name='Type .help for help!', type=1, url=''))
+	print(f'name: {bot.user.name}, id: {bot.user.id}, version: {discord.__version__}')
 
 
 @bot.command()
@@ -50,16 +52,7 @@ async def echo(ctx,cnt: typing.Optional[int] = 1,*,response):
 
 
 @bot.command()
-@commands.is_owner()
-async def _embed(ctx,*,arg):
-	try:
-		await ctx.send(embed = eval(f'discord.Embed({arg})'))
-	except:
-		await ctx.send("failed.")
-
-
-@bot.command()
-async def help(ctx):
+async def helpp(ctx):
 	message = "**^ represents an optional argument**\n\n"
 	for i, (command, description) in enumerate(help_dict.items()):
 		message += "```" + command + "``` >> " + description + "\n\n"
@@ -118,58 +111,6 @@ async def rng(ctx, maxn: int, cnt: typing.Optional[int] = 1):
 
 
 @bot.command()
-@commands.is_owner()
-async def _error(ctx, *description):
-	await ctx.send("**<Admin>** Error raised.")
-	raise discord.DiscordException(' '.join(description))
-
-
-@bot.command()
-@commands.is_owner()
-async def _info(ctx):
-	try:
-		out = "**<Admin>** Channel information.\n"
-
-		out += f'**guild:**{ctx.guild}, **guild id:**{ctx.guild.id}\n'
-
-		out += f'**channel:**{ctx.channel}, **channel id:**{ctx.channel.id}\n'
-		out += '**text channel list of guild:**\n'
-		for channel in ctx.guild.channels:
-			out += f'{channel} '
-		out += '\n'
-
-		out += f'**author:**{ctx.author}, **author id :**{ctx.author.id}\n'
-		out += '**member list of guild:**\n'
-		for m in ctx.guild.members:
-			out += f'({m}, {m.id}) '
-		out += '\n'
-
-		out += f'Functions of ctx: use command `dir(ctx)`'
-		await p(ctx, out)
-	except:
-		await ctx.send("failed.")
-		await _error(ctx, "_info failed")
-
-
-@bot.command()
-@commands.is_owner()
-async def _eval(ctx, *, arg):
-	try:
-		await ctx.send(eval(arg))
-	except:
-		await ctx.send("failed.")
-
-
-@bot.command()
-@commands.is_owner()
-async def _exec(ctx, *, arg):
-	try:
-		await ctx.send(exec(arg))
-	except:
-		await ctx.send("failed.")
-
-
-@bot.command()
 async def hi(ctx):
 	await p(ctx,DESC)
 
@@ -223,4 +164,4 @@ async def wiki(ctx, *, search):
 
 
 keep_alive()
-bot.run(db.TOKEN)
+bot.run(db.TOKEN, bot=True, reconnect=True)

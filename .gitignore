@@ -1,6 +1,5 @@
 # stuff to ignore
-.replit
-err.log
+bot/err.log
 depreciated/
 poetry.lock
 pyproject.toml
