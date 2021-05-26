@@ -13,7 +13,7 @@ def teardown(bot):
 	print(sys.argv[0] + ' being unloaded!')
 
 class OwnerCog(commands.Cog):
-	def __init__(self, bot):
+	def __init__(self, bot: commands.bot):
 		self.bot = bot
 
 	# Won't show up on the default help.
