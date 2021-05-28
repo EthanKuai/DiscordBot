@@ -27,7 +27,7 @@ class WikiCog(commands.Cog):
 		await p(ctx, out)
 
 	# wiki search results
-	async def web_wiki_search(self, search: str, is_embed: bool = True, lang: str = 'en'):
+	async def web_wiki_search(self, search: str, is_embed: bool = True, /, lang: str = 'en'):
 		api_url = f'https://{lang}.wikipedia.org/w/api.php'
 		# search closest wiki page
 		search = search.replace("%20", " ").replace("_", " ")
@@ -50,7 +50,7 @@ class WikiCog(commands.Cog):
 		else: return lst
 
 	# mediawiki API: https://github.com/mudroljub/wikipedia-api-docs
-	async def web_wiki(self, search: str, full: bool = False, lang: str = 'en'):
+	async def web_wiki(self, search: str, full: bool = False, /, lang: str = 'en'):
 		embed = discord.Embed(color = discord.Colour.light_grey())
 		api_url = f'https://{lang}.wikipedia.org/w/api.php'
 

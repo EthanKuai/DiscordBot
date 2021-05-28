@@ -2,7 +2,7 @@ import discord
 import re
 
 MAX_LEN = 1900 # discord message length
-MAX_PARA = 170 # paragraph max len
+MAX_PARA = 165 # paragraph max len
 TRIM = [("*",""),("`",""),(">>> ",""),("%20"," "),("_"," "),("   "," "),("  "," ")] # .replace() in trim()
 
 # sends list of message to ctx (context)
@@ -49,3 +49,4 @@ def trim(s: str, maxlen: int = MAX_PARA):
 			break
 	if maxlen < -1: out = out[:-3] + "..."
 	return out.strip().replace("  "," ")
+#BUG: '[hello](https://google.com/x_y_z)' breaks link

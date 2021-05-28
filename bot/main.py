@@ -54,14 +54,13 @@ async def on_ready():
 	global bot
 	print('connected!')
 	await bot.change_presence(game=discord.Game(name='Type .help for help!', type=1, url=''))
-	print(f'name: {bot.user.name}, id: {bot.user.id}, version: {discord.__version__}')
+	print(f'{bot.user.name=}; {bot.user.id=}; {discord.__version__=}')
 
 @bot.command()
 async def helpp(ctx):
-	message = "**^ represents an optional argument**\n\n"
+	message = "**``^ represents an optional argument**``\n\n"
 	for i, (command, description) in enumerate(help_dict.items()):
-		message += "```" + command + "``` >> " + description + "\n\n"
-	#await ctx.send(message)
+		message += f'**``{command}``** {description}\n\n'
 	await p(ctx,message)
 
 @bot.command()

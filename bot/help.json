@@ -1,9 +1,14 @@
 {
   ".help": "Displays this message",
-  ".hello .hi .ohayou .bonjour": "Help Pseudo remain happy!",
-  ".inspire .quote .inspiration": "A random quote to stay motivated :)",
-  ".daily": "Your daily quote and news",
-  ".news": "Current news",
+  ".quote": "A random quote to stay motivated :)",
+  ".daily": "Your daily quote and links",
+  ".reddit <Subreddit/'top'> <Post count^> <Time period^>": "",
+  ".wiki search <Page>": "Top wikipedia search results",
+  ".wiki <Page> <'full'^>": "Wikipedia page short/long preview",
+  ".gnews": "Google news, WIP",
   ".coin .2 <Repeats^>": "Flip a coin!",
-  ".rng .random .dice <Max number> <Repeats^>": "Random number generator."
+  ".rng .random .dice <Max number> <Repeats^>": "Random number generator.",
+  ".hi": "Help Pseudo remain happy!",
+  ".echo <Count^> <Message>": "Bot repeats message n times",
+  ".ping <Decimal Places^>": "Bot's ping"
 }

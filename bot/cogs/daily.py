@@ -26,7 +26,7 @@ class DailyCog(commands.Cog):
 		messages = []
 		for link in self.db.LINKS:
 			if link.startswith("https://www.reddit.com"): out = await self.reddit.web_reddit(link)
-			else: print(f'handler.read_link: link "{link}" does not match any known APIs!')
+			else: print(f'handler.read_link: {link=} does not match any known APIs!')
 			for m in out: messages.append(m)
 		return messages
 
@@ -46,19 +46,18 @@ class DailyCog(commands.Cog):
 	@daily_briefing.before_loop
 	async def daily_briefing_before(self):
 		await self.bot.wait_until_ready()
-		print('Bot connected, cog now ready!')
 
 		now = datetime.now(tz = self.db.tz)
 		start = datetime(now.year, now.month, now.day, self.db.DAILY_TIME, 0, 0, 0, tzinfo=self.db.tz)
 		delta = int((start-now).total_seconds()) % 86400
 		# waiting seconds > 0, 86400 = days in seconds
-		print(f'DailyCog waiting for {delta} seconds')
+		print(f'Bot connected\nDailyCog time left: {delta=}')
 		await asyncio.sleep(delta)
 		print('DailyCog done waiting!')
 
 	@daily_briefing.error
 	async def error_handle(self,error):
-		print(f'DailyCog: error {error}')
+		print(f'DailyCog: {error=}')
 		pass
 
 	def cog_unload(self):
