@@ -13,6 +13,9 @@ Convenience. Access multiple sites and rng in the comfort of Discord, with 100% 
 - [x] dailies set at a fixed time of the day to a fixed channel: contains [daily quotes](https://zenquotes.io/api/today)and reads off a list of links in database (such as daily top reddit posts etc.)
 - [x] rng/ coin flip
 - [x] echo command to repeat messages
+
+### Upcoming Features
+
 - [ ] daily reminder to day/week of year
 - [ ] daily backup of server
 - [ ] read image & scan for text
@@ -21,15 +24,23 @@ Convenience. Access multiple sites and rng in the comfort of Discord, with 100% 
 
 # Requirements/ Installation
 
+List found in [requirements.txt](https://github.com/EthanKuai/DiscordBot/blob/main/requirements.txt)
++ [Python 3.8](https://www.python.org/downloads/release/python-383/)
++ [Discord.py](https://pypi.org/project/discord.py/)
++ [Logging](https://pypi.org/project/logging/)
++ [Flask](https://pypi.org/project/Flask/)
++ [Replit](https://pypi.org/project/replit/)
++ [Asyncpg](https://pypi.org/project/asyncpg/)
++ [Asyncio](https://pypi.org/project/asyncio/)
++ [Requests](https://pypi.org/project/requests/)
++ [Typing](https://pypi.org/project/typing/)
+
+### Installation
+
 	git clone https://github.com/EthanKuai/DiscordBot.git
 	cd DiscordBot
 	python -m pip install --upgrade pip
  	if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
-+ [Python 3.8](https://www.python.org/downloads/release/python-383/)
-+ [Node.js](https://nodejs.org/)
-+ [React](https://facebook.github.io/react/)
-+ Others
 
 # Usage
 
