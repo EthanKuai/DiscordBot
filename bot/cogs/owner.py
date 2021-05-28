@@ -5,16 +5,10 @@ from bot import *
 import sys
 
 
-def setup(bot):
-	print(sys.argv[0] + ' being loaded!')
-	bot.add_cog(OwnerCog(bot))
-
-def teardown(bot):
-	print(sys.argv[0] + ' being unloaded!')
-
 class OwnerCog(commands.Cog):
 	def __init__(self, bot: commands.bot):
 		self.bot = bot
+		print(sys.argv[0] + ' being loaded!')
 
 	# Won't show up on the default help.
 	@commands.command(name='_load', hidden=True)
@@ -67,15 +61,9 @@ class OwnerCog(commands.Cog):
 	async def debug_info(self, ctx):
 		try:
 			out = "**<Admin>** Channel information.\n"
-
 			out += f'**guild:**{ctx.guild}, **guild id:**{ctx.guild.id}\n'
-
 			out += f'**channel:**{ctx.channel}, **channel id:**{ctx.channel.id}\n'
-			out += '**text channel list of guild:**\n'
-			for channel in ctx.guild.channels:
-				out += f'{channel} '
-			out += '\n'
-
+			out += f'**text channel list of guild:** {' '.join(ctx.guild.channels)}\n'
 			out += f'**author:**{ctx.author}, **author id :**{ctx.author.id}\n'
 			out += '**member list of guild:**\n'
 			for m in ctx.guild.members:

@@ -16,6 +16,9 @@ HELP_COMMAND = commands.DefaultHelpCommand(no_category = 'Others')
 # bot
 intents = discord.Intents.default()
 intents.members = True
+intents.reactions = True
+intents.typing = False
+intents.presences = False
 bot = commands.Bot(command_prefix='.', description=DESC, intents=intents,
 					case_insensitive=True, help_command = HELP_COMMAND)
 #bot.remove_command('help')
