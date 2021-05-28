@@ -63,7 +63,7 @@ class OwnerCog(commands.Cog):
 			out = "**<Admin>** Channel information.\n"
 			out += f'**guild:**{ctx.guild}, **guild id:**{ctx.guild.id}\n'
 			out += f'**channel:**{ctx.channel}, **channel id:**{ctx.channel.id}\n'
-			out += f'**text channel list of guild:** {' '.join(ctx.guild.channels)}\n'
+			out += f'**text channel list of guild:** {" ".join(ctx.guild.channels)}\n'
 			out += f'**author:**{ctx.author}, **author id :**{ctx.author.id}\n'
 			out += '**member list of guild:**\n'
 			for m in ctx.guild.members:
