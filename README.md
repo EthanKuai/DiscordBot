@@ -13,11 +13,11 @@ Convenience. Access multiple sites and rng in the comfort of Discord, with 100% 
 - [x] dailies set at a fixed time of the day to a fixed channel: contains [daily quotes](https://zenquotes.io/api/today)and reads off a list of links in database (such as daily top reddit posts etc.)
 - [x] rng/ coin flip
 - [x] echo command to repeat messages
-- [] daily reminder to day/week of year
-- [] daily backup of server
-- [] read image & scan for text
-- [] newsfeed from *gnews etc.*
-- [] calculator
+- [ ] daily reminder to day/week of year
+- [ ] daily backup of server
+- [ ] read image & scan for text
+- [ ] API connections & pings/updates from *twitter, gnews, merriam webster, etc.*
+- [ ] calculator
 
 # Requirements/ Installation
 
