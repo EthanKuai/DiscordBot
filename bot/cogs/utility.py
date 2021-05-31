@@ -19,7 +19,7 @@ class UtilityCog(commands.Cog):
 			await ctx.send(response)
 
 	# flips a coin cnt times
-	@commands.command()
+	@commands.command(aliases=['coin','2'])
 	async def coin(self, ctx, cnt: typing.Optional[int] = 1):
 		message = ""
 		total = 0
@@ -41,7 +41,7 @@ class UtilityCog(commands.Cog):
 		await p(ctx,message)
 
 	# rolls a maxn sided nice cnt times
-	@commands.command()
+	@commands.command(aliases=['rng','random','dice'])
 	async def rng(self, ctx, maxn: int, cnt: typing.Optional[int] = 1):
 		message = ""
 		total = 0

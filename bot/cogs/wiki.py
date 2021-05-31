@@ -11,7 +11,7 @@ class WikiCog(commands.Cog):
 		self.web_bot = web_bot
 		print(sys.argv[0] + ' being loaded!')
 
-	@commands.command()
+	@commands.command(aliases=['wiki','wikipedia','encyclopedia'])
 	async def wiki(self, ctx, *, search):
 		search = search.split(' ')
 		if search[0] == 'search':
@@ -25,6 +25,10 @@ class WikiCog(commands.Cog):
 		else:
 			out = await self.web_wiki(' '.join(search))
 		await p(ctx, out)
+
+#https://stackoverflow.com/questions/27193619/get-all-sections-separately-with-wikimedia-api
+# allow searching specific sections + listing out all sections.
+# 1-line abstract when searching, create function for that
 
 	# wiki search results
 	async def web_wiki_search(self, search: str, is_embed: bool = True, /, lang: str = 'en'):

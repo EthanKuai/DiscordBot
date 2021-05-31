@@ -10,6 +10,6 @@ class GnewsCog(commands.Cog):
 		self.bot = bot
 		print(sys.argv[0] + ' being loaded!')
 
-	@commands.command()
+	@commands.command(aliases=['gnews','googlenews'])
 	async def gnews(self, ctx, *args):
 		await p(ctx, "there is supposed to be a news feeds")

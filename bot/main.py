@@ -1,13 +1,10 @@
 import discord
 import logging
 from discord.ext import commands
-from .keep_alive import keep_alive
 
 from bot import *
 from .cogs import * # !!! does this work
-import typing
 import json
-import random
 
 
 DESC = "Hi I am Pseudo, a personal discord bot. Currently in development."
@@ -33,7 +30,8 @@ bot_cogs = {'owner':OwnerCog(bot),
 			'utility':UtilityCog(bot),
 			'reddit':RedditCog(bot, web_bot2),
 			'wiki':WikiCog(bot, web_bot2),
-			'quote':QuoteCog(bot, web_bot2)
+			'quote':QuoteCog(bot, web_bot2),
+			'singapore':SingaporeCog(bot)
 }
 bot_cogs['daily'] = DailyCog(bot, db, bot_cogs['reddit'], bot_cogs['quote'])
 if __name__ == '__main__':
@@ -63,7 +61,7 @@ async def helpp(ctx):
 		message += f'**``{command}``** {description}\n\n'
 	await p(ctx,message)
 
-@bot.command()
+@bot.command(aliases=['hi','hello','bonjour','ohayou','halo','nihao'])
 async def hi(ctx):
 	await p(ctx,DESC)
 

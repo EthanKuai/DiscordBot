@@ -13,6 +13,7 @@ Convenience. Access multiple sites and rng in the comfort of Discord, with 100% 
 - [x] dailies set at a fixed time of the day to a fixed channel: contains [daily quotes](https://zenquotes.io/api/today)and reads off a list of links in database (such as daily top reddit posts etc.)
 - [x] rng/ coin flip
 - [x] echo command to repeat messages
+- [x] check Singapore MRT map
 
 ### Upcoming Features
 
@@ -22,7 +23,7 @@ Convenience. Access multiple sites and rng in the comfort of Discord, with 100% 
 - [ ] API connections & pings/updates from *twitter, gnews, merriam webster, etc.*
 - [ ] calculator
 
-# Requirements/ Installation
+# Dependencies
 
 List found in [requirements.txt](https://github.com/EthanKuai/DiscordBot/blob/main/requirements.txt)
 + [Python 3.8](https://www.python.org/downloads/release/python-383/)

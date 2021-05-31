@@ -13,7 +13,7 @@ class QuoteCog(commands.Cog):
 		print(sys.argv[0] + ' being loaded!')
 		self.QUOTES = []
 
-	@commands.command()
+	@commands.command(aliases=['quote','inspire','inspiration'])
 	async def quote(self, ctx, cnt: text_or_int(QUOTE_DAILY) = 1):
 		out = await self.web_quote(cnt)
 		if cnt == -1: out = "**Quote of the day**: " + out

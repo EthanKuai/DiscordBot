@@ -22,6 +22,24 @@ async def p(ctx, messages, keyword: str = "\n"):
 			for i in range(0, len(line)+MAX_LEN-1, MAX_LEN): # long line
 				await ctx.send(line[i: i + MAX_LEN])
 
+
+def closestMatch(s: str, lst_in: list, /, splitby: str = ' '):
+	lst = []
+	for i in lst_in: lst += [i.lower().split(splitby)]
+	s = s.lower().strip()
+
+	score = [0 for i in lst]
+	maxindex = 0 # index of maximum scorer
+
+	for phrase in range(len(lst)):
+		for word in lst[phrase]:
+			if re.search(word, s):
+				score[phrase] += 1
+		if score[phrase] > score[maxindex]:
+			maxindex = phrase
+	return maxindex, splitby.join(lst[maxindex])
+
+
 # trims string to fit maxlen, removes special symbols, accounts for hyperlinks
 def trim(s: str, maxlen: int = MAX_PARA):
 	out = ''

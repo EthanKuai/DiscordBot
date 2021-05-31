@@ -6,3 +6,4 @@ from .wiki import *
 from .quote import *
 from .utility import *
 from .gnews import *
+from .singapore import *
