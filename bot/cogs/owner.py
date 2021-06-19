@@ -13,7 +13,7 @@ class OwnerCog(commands.Cog):
 	# Won't show up on the default help.
 	@commands.command(name='_load', hidden=True)
 	@commands.is_owner()
-	async def cog_load(self, ctx, cog):
+	async def load_cog(self, ctx, cog):
 		try:
 			self.bot.load_extension(cog)
 		except Exception as e:
@@ -24,7 +24,7 @@ class OwnerCog(commands.Cog):
 
 	@commands.command(name='_unload', hidden=True)
 	@commands.is_owner()
-	async def cog_unload(self, ctx, cog):
+	async def unload_cog(self, ctx, cog):
 		try:
 			self.bot.unload_extension(cog)
 		except Exception as e:
@@ -35,9 +35,9 @@ class OwnerCog(commands.Cog):
 
 	@commands.command(name='_reload', hidden=True)
 	@commands.is_owner()
-	async def cog_reload(self, ctx, cog):
-		await self.cog_load(ctx, cog)
-		await self.cog_unload(ctx, cog)
+	async def reload_cog(self, ctx, cog):
+		await self.load_cog(ctx, cog)
+		await self.unload_cog(ctx, cog)
 
 
 	@commands.command(name='_embed', hidden=True)

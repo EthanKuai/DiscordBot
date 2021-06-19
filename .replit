@@ -1,2 +1,7 @@
 language = "python3"
-run = "python bot/main.py"
+run = "python -m bot.main"
+onBoot="echo Booting up!"
+
+[packager]
+ignoredPaths=[".git", ".github", ".log"]
+ignoredPackages=["flask", "replit"]

@@ -30,8 +30,11 @@ class DailyCog(commands.Cog):
 			for m in out: messages.append(m)
 		return messages
 
-	# daily briefing every 24h at set time
 	@commands.command(aliases=['daily','dailybriefing'])
+	async def daily_briefing_command(self, ctx):
+		await self.daily_briefing(ctx)
+
+	# daily briefing every 24h at set time
 	@tasks.loop(hours=24.0, minutes = 0.0)
 	async def daily_briefing(self, ctx = None):
 		async with self.lock:

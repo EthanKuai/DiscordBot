@@ -3,7 +3,8 @@ import logging
 from discord.ext import commands
 
 from bot import *
-from .cogs import * # !!! does this work
+from .cogs import *
+from .keep_alive import alive
 import json
 
 
@@ -21,7 +22,7 @@ bot = commands.Bot(command_prefix='.', description=DESC, intents=intents,
 #bot.remove_command('help')
 
 # utilities
-with open('help.json',) as f: help_dict = json.load(f)
+with open('bot/help.json',) as f: help_dict = json.load(f)
 db = db_accessor()
 web_bot2 = web_accessor()
 
@@ -35,8 +36,8 @@ bot_cogs = {'owner':OwnerCog(bot),
 }
 bot_cogs['daily'] = DailyCog(bot, db, bot_cogs['reddit'], bot_cogs['quote'])
 if __name__ == '__main__':
-	for cog_name in bot_cogs.keys():
-		bot.load_extension(bot_cogs[cog_name]) # !!! does this work
+	for i in bot_cogs.values():
+		bot.add_cog(i)
 
 # https://docs.python.org/3/library/logging.html#module-logging
 # https://docs.python.org/3/howto/logging.html#logging-basic-tutorial
@@ -51,7 +52,10 @@ logger.addHandler(handler)
 async def on_ready():
 	global bot
 	print('connected!')
-	await bot.change_presence(game=discord.Game(name='Type .help for help!', type=1, url=''))
+	# discord.Game(name="", type=1, url="")
+	# discord.Streaming(name="", url="")
+	# discord.Activity(type=discord.ActivityType.listening/watching, name="")
+	await bot.change_presence(activity=discord.Game(name='Type .help for help!', type=1))
 	print(f'{bot.user.name=}; {bot.user.id=}; {discord.__version__=}')
 
 @bot.command()
@@ -62,8 +66,8 @@ async def helpp(ctx):
 	await p(ctx,message)
 
 @bot.command(aliases=['hi','hello','bonjour','ohayou','halo','nihao'])
-async def hi(ctx):
+async def description_command(ctx):
 	await p(ctx,DESC)
 
-keep_alive()
+alive()
 bot.run(db.TOKEN, bot=True, reconnect=True)
