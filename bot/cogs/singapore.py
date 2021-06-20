@@ -37,6 +37,14 @@ class SingaporeCog(commands.Cog):
 
 
 	@mrt.command()
+	async def lines(self, ctx):
+		"""List of Singapore MRT lines."""
+		embed = discord.Embed(title = "All MRT Stations")
+		embed.description = '\n'.join(self.mrt_lines)
+		await p(ctx, embed)
+
+
+	@mrt.command()
 	async def station(self, ctx, *, inn: str):
 		"""Search for Singapore MRT station."""
 		stations = []
@@ -49,13 +57,13 @@ class SingaporeCog(commands.Cog):
 
 
 	@mrt.command()
-	async def stations(self, ctx, *, inn: str):
+	async def stations(self, ctx):
 		"""List of Singapore MRT stations."""
 		stations = []
 		for x in self.mrt_stations:
 			stations += x
-		i, station = closestMatch(inn, stations)
-		embed = discord.Embed(title = station)
+		embed = discord.Embed(title = "All MRT Stations")
+		embed.description = '\n'.join(stations)
 		await p(ctx, embed)
 
 
