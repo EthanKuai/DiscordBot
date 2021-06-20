@@ -1,4 +1,7 @@
 {
+	"daily": {
+		"daily": ["dailybriefing"]
+	}
 	"quote": {
 		"quote": ["saying","inspire","inspiration"]
 	},

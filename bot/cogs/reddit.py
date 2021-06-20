@@ -15,7 +15,7 @@ class RedditCog(commands.Cog):
 		print(sys.argv[0] + ' being loaded!')
 
 
-	@commands.command(usage=usages['reddit']['reddit'], aliases=aliases['reddit']['reddit'])
+	@commands.command(usage=USAGES['reddit']['reddit'], aliases=ALIASES['reddit']['reddit'])
 	async def reddit(self, ctx,
 		sr: regex(antireg="\d|\s",maxlen=21),
 		cnt: text_or_int(REDDIT) = 5,

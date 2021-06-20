@@ -15,14 +15,14 @@ class UtilityCog(commands.Cog):
 		print(sys.argv[0] + ' being loaded!')
 
 
-	@commands.command(usage=usages['utility']['echo'])
+	@commands.command(usage=USAGES['utility']['echo'])
 	async def echo(self, ctx, cnt: typing.Optional[int] = 1,*,response):
 		"""Sends messages with content given."""
 		for i in range(min(cnt,5)):
 			await ctx.send(response)
 
 
-	@commands.command(usage=usages['utility']['coin'], aliases=aliases['utility']['coin'])
+	@commands.command(usage=USAGES['utility']['coin'], aliases=ALIASES['utility']['coin'])
 	async def coin(self, ctx, cnt: typing.Optional[int] = 1):
 		"""Flips a coin x times!"""
 		message = ""
@@ -50,7 +50,7 @@ class UtilityCog(commands.Cog):
 		await badarguments(ctx, 'utility', 'coin')
 
 
-	@commands.command(usage=usages['utility']['rng'], aliases=aliases['utility']['rng'])
+	@commands.command(usage=USAGES['utility']['rng'], aliases=ALIASES['utility']['rng'])
 	async def rng(self, ctx, maxn: int, cnt: typing.Optional[int] = 1):
 		"""Random Number Generator. Rolls x-sided dice y times."""
 		message = ""
@@ -71,7 +71,7 @@ class UtilityCog(commands.Cog):
 		await badarguments(ctx, 'utility', 'rng')
 
 
-	@commands.command(usage=usages['utility']['ping'])
+	@commands.command(usage=USAGES['utility']['ping'])
 	async def ping(self, ctx, precision: typing.Optional[int] = 3):
 		"""Bot latency test."""
 		await ctx.reply('Pong! Latency: {0}'.format(round(self.bot.latency, precision)))

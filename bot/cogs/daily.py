@@ -34,7 +34,7 @@ class DailyCog(commands.Cog):
 		return messages
 
 
-	@commands.command(aliases=['dailybriefing'])
+	@commands.command(aliases=ALIASES['daily']['daily'])
 	async def daily(self, ctx):
 		"""Your daily quotes and links, does not interrupt usual 24h daily briefing loop."""
 		await self.daily_briefing(ctx)

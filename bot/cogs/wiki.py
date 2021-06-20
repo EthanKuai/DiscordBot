@@ -14,7 +14,7 @@ class WikiCog(commands.Cog):
 		print(sys.argv[0] + ' being loaded!')
 
 
-	@commands.command(usage=usages['wiki']['wiki'], aliases=aliases['wiki']['wiki'])
+	@commands.command(usage=USAGES['wiki']['wiki'], aliases=ALIASES['wiki']['wiki'])
 	async def wiki(self, ctx, search: str):
 		"""Summary of Wikipedia page"""
 		search = search.replace('_', ' ')
@@ -27,7 +27,7 @@ class WikiCog(commands.Cog):
 		await p(ctx, out)
 
 
-	@commands.command(aliases=aliases['wiki']['wikisearch'])
+	@commands.command(aliases=ALIASES['wiki']['wikisearch'])
 	async def wikisearch(self, ctx, search: str):
 		"""Top Wikipedia search results"""
 		search = search.replace('_', ' ')

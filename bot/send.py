@@ -1,9 +1,25 @@
 import discord
+import json
 import re
 
 MAX_LEN = 1900 # discord message length
 MAX_PARA = 165 # paragraph max len
 TRIM = [("*",""),("`",""),(">>> ",""),("%20"," "),("_"," "),("   "," "),("  "," ")] # .replace() in trim()
+with open('bot/usage.json') as f: USAGES = json.load(f)
+with open('bot/aliases.json') as f: ALIASES = json.load(f)
+
+# help format error messages when user keys in wrong arguments for a command
+async def badarguments(ctx, cog: str, name: str):
+	out = 'Wrong arguments!\n'
+	out += f'**Arguments**: `.{name} {USAGES[cog][name]}`\n'
+	if cog in ALIASES:
+		if name in ALIASES[cog]:
+			out += f'**Aliases**: {", ".join(ALIASES[cog][name])}\n'
+	out += '\n**``<x>``**: *x* is a required arguments; **``[y=m]``**: *y* is an optional argument with default value *m*\n'
+	out += 'Type `.help command` for more info on a command.\n'
+	out += 'You can also type `.help category` for more info on a category.'
+	await ctx.send(out)
+
 
 # sends list of message to ctx (context)
 async def p(ctx, messages, keyword: str = "\n"):

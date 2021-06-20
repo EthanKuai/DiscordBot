@@ -4,7 +4,7 @@ from discord.ext import commands
 
 from bot import *
 from .cogs import *
-import json
+from .keep_alive import alive
 
 
 DESC = "Hi I am Pseudo, a personal discord bot. Currently in development."
@@ -25,8 +25,6 @@ bot = commands.Bot(
 )
 
 # utilities
-with open('bot/usage.json') as f: usages = json.load(f)
-with open('bot/aliases.json') as f: aliases = json.load(f)
 db = db_accessor()
 web_bot = web_accessor()
 
@@ -50,18 +48,6 @@ logger.setLevel(logging.ERROR) #INFO, DEBUG, ERROR, WARNING, CRITICAL
 handler = logging.FileHandler(filename='err.log', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
-
-# help format error messages when user keys in wrong arguments for a command
-async def badarguments(ctx, cog: str, name: str):
-	out = 'Wrong arguments!\n'
-	out += f'**Arguments**: `.{name} {usages[cog][name]}`\n'
-	if cog in aliases:
-		if name in aliases[cog]:
-			out += f'**Aliases**: {", ".join(aliases[cog][name])}\n'
-	out += '\n**``<x>``**: *x* is a required arguments; **``[y=m]``**: *y* is an optional argument with default value *m*\n'
-	out += 'Type `.help command` for more info on a command.\n'
-	out += 'You can also type `.help category` for more info on a category.'
-	await ctx.send(out)
 
 # When bot is ready
 @bot.event

@@ -16,7 +16,7 @@ class QuoteCog(commands.Cog):
 		self.QUOTES = []
 
 
-	@commands.command(aliases=aliases['quote']['quote'], usage=usages['quote']['quote'])
+	@commands.command(usage=USAGES['quote']['quote'], aliases=ALIASES['quote']['quote'])
 	async def quote(self, ctx, cnt: text_or_int(QUOTE_DAILY) = 1):
 		"""QOTD & random quotes to help you stay motivated! Powered by Zenquote."""
 		out = await self.web_quote(cnt)
