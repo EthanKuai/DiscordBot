@@ -59,7 +59,7 @@ async def on_ready():
 	await bot.change_presence(activity=discord.Game(name='Type .help for help!', type=1))
 	print(f'{bot.user.name=}; {bot.user.id=}; {discord.__version__=}')
 
-@bot.command(aliases=['hello','bonjour','ohayou','halo','nihao'])
+@bot.command(aliases=ALIASES['hi'])
 async def hi(ctx):
 	"""Help Pseudo remain happy!"""
 	await p(ctx,DESC)

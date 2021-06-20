@@ -82,7 +82,7 @@ class OwnerCog(commands.Cog):
 			await p(ctx, out)
 		except:
 			await ctx.send("failed.")
-			await self.debug_error(ctx, "_info failed")
+			await self.debug_error(ctx, description="_info failed")
 
 
 	@commands.command(name='_eval', hidden=True)

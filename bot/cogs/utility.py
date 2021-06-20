@@ -16,7 +16,7 @@ class UtilityCog(commands.Cog):
 
 
 	@commands.command(usage=USAGES['utility']['echo'])
-	async def echo(self, ctx, cnt: typing.Optional[int] = 1,*,response):
+	async def echo(self, ctx, cnt: typing.Optional[int] = 1, *, response: str):
 		"""Sends messages with content given."""
 		for i in range(min(cnt,5)):
 			await ctx.send(response)
