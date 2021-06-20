@@ -11,6 +11,8 @@ import asyncio
 
 
 class DailyCog(commands.Cog):
+	"""Daily Briefing"""
+
 	def __init__(self, bot: commands.bot, db: db_accessor, reddit: RedditCog, quote: QuoteCog):
 		self.bot = bot
 		self.db = db
@@ -21,6 +23,7 @@ class DailyCog(commands.Cog):
 		self.daily_briefing.add_exception_type(asyncpg.PostgresConnectionError)
 		self.daily_briefing.start()
 
+
 	# scans through links in database, if known API reads & outputs message
 	async def view_links(self):
 		messages = []
@@ -30,9 +33,12 @@ class DailyCog(commands.Cog):
 			for m in out: messages.append(m)
 		return messages
 
-	@commands.command(aliases=['daily','dailybriefing'])
-	async def daily_briefing_command(self, ctx):
+
+	@commands.command(aliases=['dailybriefing'])
+	async def daily(self, ctx):
+		"""Your daily quotes and links, does not interrupt usual 24h daily briefing loop."""
 		await self.daily_briefing(ctx)
+
 
 	# daily briefing every 24h at set time
 	@tasks.loop(hours=24.0, minutes = 0.0)
@@ -42,8 +48,9 @@ class DailyCog(commands.Cog):
 				ctx = self.bot.get_guild(self.db.GUILD_ID).get_channel(self.db.DAILY_CHANNEL)
 			out = ["Your daily briefing up and coming!"]
 			out += await self.view_links()
-			out += await self.quote.web_quote(-1) # quote of the day
+			out += [await self.quote.web_quote(-1)] # quote of the day
 			await p(ctx, out)
+
 
 	# reads set-time for daily briefing, waits for that time
 	@daily_briefing.before_loop
@@ -58,10 +65,12 @@ class DailyCog(commands.Cog):
 		await asyncio.sleep(delta)
 		print('DailyCog done waiting!')
 
+
 	@daily_briefing.error
 	async def error_handle(self,error):
 		print(f'DailyCog: {error=}')
 		pass
+
 
 	def cog_unload(self):
 		self.daily_briefing.cancel()

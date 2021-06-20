@@ -7,14 +7,18 @@ import sys
 QUOTE_DAILY = {"today":-1, "daily":-1, "qotd":-1, "day":-1}
 
 class QuoteCog(commands.Cog):
+	"""Quotes"""
+
 	def __init__(self, bot: commands.bot, web_bot: web_accessor):
 		self.bot = bot
 		self.web_bot = web_bot
 		print(sys.argv[0] + ' being loaded!')
 		self.QUOTES = []
 
-	@commands.command(aliases=['quote','inspire','inspiration'])
+
+	@commands.command(aliases=aliases['quote']['quote'], usage=usages['quote']['quote'])
 	async def quote(self, ctx, cnt: text_or_int(QUOTE_DAILY) = 1):
+		"""QOTD & random quotes to help you stay motivated! Powered by Zenquote."""
 		out = await self.web_quote(cnt)
 		if cnt == -1: out = "**Quote of the day**: " + out
 		await p(ctx, out)
@@ -22,8 +26,8 @@ class QuoteCog(commands.Cog):
 
 	@quote.error
 	async def quote_error(self, ctx, error):
-		if isinstance(error, commands.BadArgument):
-			await ctx.send('**.quote** Only accepts one argument (opt): *number of quotes*, or *"daily/qotd/today"* for quote of the day')
+		await badarguments(ctx, 'quote', 'quote')
+
 
 	# zenquotes API, returns str of quotes: https://premium.zenquotes.io/zenquotes-documentation/
 	async def web_quote(self, cnt: int):

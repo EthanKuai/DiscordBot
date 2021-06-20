@@ -4,4 +4,4 @@ onBoot="echo Booting up!"
 
 [packager]
 ignoredPaths=[".git", ".github", ".log"]
-ignoredPackages=["flask", "replit"]
+ignoredPackages=["flask", "replit", "logging", "asyncpg", "asyncio", "requests"]

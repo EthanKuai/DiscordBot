@@ -8,19 +8,23 @@ import random
 
 
 class UtilityCog(commands.Cog):
+	"""Utility"""
+
 	def __init__(self, bot: commands.bot):
 		self.bot = bot
 		print(sys.argv[0] + ' being loaded!')
 
-	# repeat command
-	@commands.command()
+
+	@commands.command(usage=usages['utility']['echo'])
 	async def echo(self, ctx, cnt: typing.Optional[int] = 1,*,response):
+		"""Sends messages with content given."""
 		for i in range(min(cnt,5)):
 			await ctx.send(response)
 
-	# flips a coin cnt times
-	@commands.command(aliases=['coin','2'])
+
+	@commands.command(usage=usages['utility']['coin'], aliases=aliases['utility']['coin'])
 	async def coin(self, ctx, cnt: typing.Optional[int] = 1):
+		"""Flips a coin x times!"""
 		message = ""
 		total = 0
 
@@ -37,12 +41,18 @@ class UtilityCog(commands.Cog):
 				total += 1
 			else: message += no
 
-		if cnt > 1: message += "\nTotal sum: **" + str(total) + "**"
+		if cnt > 1: message += "\nTotal sum: **``" + str(total) + "``**"
 		await p(ctx,message)
 
-	# rolls a maxn sided nice cnt times
-	@commands.command(aliases=['rng','random','dice'])
+
+	@coin.error
+	async def coin_error(self, ctx, error):
+		await badarguments(ctx, 'utility', 'coin')
+
+
+	@commands.command(usage=usages['utility']['rng'], aliases=aliases['utility']['rng'])
 	async def rng(self, ctx, maxn: int, cnt: typing.Optional[int] = 1):
+		"""Random Number Generator. Rolls x-sided dice y times."""
 		message = ""
 		total = 0
 
@@ -52,10 +62,16 @@ class UtilityCog(commands.Cog):
 			total += tmp
 
 		if cnt > 1:
-			message += "\nTotal sum: **" + str(total) + "**"
+			message += "\nTotal sum: **``" + str(total) + "``**"
 		await p(ctx,message)
 
-	# latency test
-	@commands.command()
+
+	@rng.error
+	async def rng_error(self, ctx, error):
+		await badarguments(ctx, 'utility', 'rng')
+
+
+	@commands.command(usage=usages['utility']['ping'])
 	async def ping(self, ctx, precision: typing.Optional[int] = 3):
+		"""Bot latency test."""
 		await ctx.reply('Pong! Latency: {0}'.format(round(self.bot.latency, precision)))

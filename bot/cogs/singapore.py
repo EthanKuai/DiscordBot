@@ -8,29 +8,40 @@ import re
 
 
 class SingaporeCog(commands.Cog):
+	"""Singapore"""
+
 	def __init__(self, bot: commands.bot):
 		self.bot = bot
 		print(sys.argv[0] + ' being loaded!')
 		self.mrt_initialise()
 
-	@commands.command()
-	async def mrtmap(self, ctx):
+
+	@commands.group()
+	async def mrt(self, ctx):
+		pass
+
+
+	@mrt.command()
+	async def map(self, ctx):
 		await p(ctx, self.mrt_map)
 
-	@commands.command()
-	async def mrtline(self, ctx):
+
+	@mrt.command()
+	async def lines(self, ctx):
 		i, line = closestMatch(ctx, self.mrt_lines)
 		embed = discord.Embed(title = line, color = self.mrt_colors[i])
 		embed.description = '\n'.join(self.mrt_stations[i])
 		await p(ctx, embed)
 
-	@commands.command(aliases=['mrt','mrtstation'])
-	async def mrt(self, ctx):
+
+	@mrt.command()
+	async def stations(self, ctx):
 		stations = []
 		for x in self.mrt_stations: stations += x
 		i, station = closestMatch(ctx, stations)
 		embed = discord.Embed(title = station)
 		await p(ctx, embed)
+
 
 	def mrt_initialise(self):
 		self.mrt_map = "https://www.sgtrains.com/img/network/systemmap_2020.png"

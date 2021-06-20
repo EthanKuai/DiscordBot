@@ -6,34 +6,45 @@ import sys
 
 
 class WikiCog(commands.Cog):
+	"""Wikipedia"""
+
 	def __init__(self, bot: commands.bot, web_bot: web_accessor):
 		self.bot = bot
 		self.web_bot = web_bot
 		print(sys.argv[0] + ' being loaded!')
 
-	@commands.command(aliases=['wiki','wikipedia','encyclopedia'])
-	async def wiki(self, ctx, *, search):
-		search = search.split(' ')
-		if search[0] == 'search':
-			out = await self.web_wiki_search(' '.join(search[1:]))
-		elif search[-1] == 'search':
-			out = await self.web_wiki_search(' '.join(search[:-1]))
-		elif search[0] == 'full':
-			out = await self.web_wiki(' '.join(search[1:]), True)
-		elif search[-1] == 'full':
-			out = await self.web_wiki(' '.join(search[:-1]), True)
+
+	@commands.command(usage=usages['wiki']['wiki'], aliases=aliases['wiki']['wiki'])
+	async def wiki(self, ctx, search: str):
+		"""Summary of Wikipedia page"""
+		search = search.replace('_', ' ')
+
+		if search.endswith('full'):
+			search = ' '.join(search.split(' ')[:-1])
+			out = await self.web_wiki(search, True)
 		else:
-			out = await self.web_wiki(' '.join(search))
+			out = await self.web_wiki(search)
 		await p(ctx, out)
 
-#https://stackoverflow.com/questions/27193619/get-all-sections-separately-with-wikimedia-api
-# allow searching specific sections + listing out all sections.
-# 1-line abstract when searching, create function for that
+
+	@commands.command(aliases=aliases['wiki']['wikisearch'])
+	async def wikisearch(self, ctx, search: str):
+		"""Top Wikipedia search results"""
+		search = search.replace('_', ' ')
+
+		out = await self.web_wiki_search(search)
+		await p(ctx, out)
+
+
+	# https://stackoverflow.com/questions/27193619/get-all-sections-separately-with-wikimedia-api
+	# allow searching specific sections + listing out all sections.
+	# 1-line abstract when searching, create function for that
+
 
 	# wiki search results
 	async def web_wiki_search(self, search: str, is_embed: bool = True, /, lang: str = 'en'):
 		api_url = f'https://{lang}.wikipedia.org/w/api.php'
-		# search closest wiki page
+		# get closest wiki page
 		search = search.replace("%20", " ").replace("_", " ")
 		search_params = {
 			"action": "opensearch",
@@ -52,6 +63,7 @@ class WikiCog(commands.Cog):
 			embed.title = f'Wiki search results for: {search}'
 			return embed
 		else: return lst
+
 
 	# mediawiki API: https://github.com/mudroljub/wikipedia-api-docs
 	async def web_wiki(self, search: str, full: bool = False, /, lang: str = 'en'):

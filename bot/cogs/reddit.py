@@ -7,13 +7,21 @@ import sys
 REDDIT = {"now":"now", "hour":"hour", "day":"day", "daily":"day", "today":"day", "week":"week", "month":"month", "year":"year", "all":"all", "alltime":"all", "overall":"all"}
 
 class RedditCog(commands.Cog):
+	"""Reddit"""
+
 	def __init__(self, bot: commands.bot, web_bot: web_accessor):
 		self.bot = bot
 		self.web_bot = web_bot
 		print(sys.argv[0] + ' being loaded!')
 
-	@commands.command()
-	async def reddit(self, ctx, sr: regex(antireg="\d|\s",maxlen=21), cnt: text_or_int(REDDIT) = 5, sortby: text_or_int(REDDIT, 0) = "day"):
+
+	@commands.command(usage=usages['reddit']['reddit'], aliases=aliases['reddit']['reddit'])
+	async def reddit(self, ctx,
+		sr: regex(antireg="\d|\s",maxlen=21),
+		cnt: text_or_int(REDDIT) = 5,
+		sortby: text_or_int(REDDIT, 0) = "day"
+	):
+		"""Top x posts of a subreddit, default to sort by day."""
 		if isinstance(cnt, str):
 			sortby = cnt; cnt = 5
 		cnt = min(max(1, cnt),20)
@@ -25,8 +33,8 @@ class RedditCog(commands.Cog):
 
 	@reddit.error
 	async def reddit_error(self, ctx, error):
-		if isinstance(error, commands.BadArgument):
-			await ctx.send('**.reddit** Accepts 3 arguments: *subreddit*, *number of posts* (opt) and *sort by "hour/day/week/month/year/all"* (opt)\nSpecial argument: "top" as subreddit for overall top posts.')
+		await badarguments(ctx, 'reddit', 'reddit')
+
 
 	# reddit API, returns embed messages
 	async def web_reddit(self, link: str):
