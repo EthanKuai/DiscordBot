@@ -5,7 +5,7 @@ import re
 MAX_LEN = 1900 # discord message length
 MAX_PARA = 165 # paragraph max len
 TRIM = [("*",""),("`",""),(">>> ",""),("%20"," "),("_"," "),("   "," "),("  "," ")] # .replace() in trim()
-with open('bot/usage.json') as f: USAGES = json.load(f)
+with open('bot/usages.json') as f: USAGES = json.load(f)
 with open('bot/aliases.json') as f: ALIASES = json.load(f)
 
 # help format error messages when user keys in wrong arguments for a command
