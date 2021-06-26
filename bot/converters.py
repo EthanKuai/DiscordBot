@@ -2,6 +2,8 @@ from discord.ext import commands
 import re
 
 class text_or_int(commands.Converter):
+	"""Accepts some words, and can accept integers as well."""
+
 	def __init__(self, text: dict, accept_int: bool = True):
 		self.text = text # dict of accepted text
 		self.accept_int = accept_int
@@ -16,6 +18,8 @@ class text_or_int(commands.Converter):
 
 
 class regex(commands.Converter):
+	"""Accepts arguments within a max length, passing regex and failing antiregex"""
+
 	def __init__(self, antireg: str = "", reg: str = "", maxlen: int = 2000):
 		self.reg = reg
 		self.antireg = antireg

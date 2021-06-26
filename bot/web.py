@@ -5,13 +5,15 @@ import requests
 
 
 class web_accessor:
+	"""Reads data from the web."""
+
 	def __init__(self):
 		self.loop = asyncio.get_event_loop()
 		self.client = aiohttp.ClientSession(loop=self.loop)
 		self.session = requests.Session()
 
-	# reads & returns json of url [aiohttp no params/requests with params]
 	async def web_json(self, url: str, params = -1):
+		"""Reads & returns json of url [aiohttp no params/requests with params]."""
 		if params == -1:
 			async with self.client.get(url) as response:
 				assert response.status == 200

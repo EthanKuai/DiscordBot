@@ -15,7 +15,7 @@ class WikiCog(commands.Cog):
 
 
 	@commands.command(usage=USAGES['wiki']['wiki'], aliases=ALIASES['wiki']['wiki'])
-	async def wiki(self, ctx, search: str):
+	async def wiki(self, ctx, *, search: str):
 		"""Summary of Wikipedia page"""
 		search = search.replace('_', ' ')
 
@@ -28,7 +28,7 @@ class WikiCog(commands.Cog):
 
 
 	@commands.command(aliases=ALIASES['wiki']['wikisearch'])
-	async def wikisearch(self, ctx, search: str):
+	async def wikisearch(self, ctx, *, search: str):
 		"""Top Wikipedia search results"""
 		search = search.replace('_', ' ')
 
