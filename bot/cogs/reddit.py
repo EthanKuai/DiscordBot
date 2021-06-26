@@ -53,7 +53,7 @@ class RedditCog(commands.Cog):
 			desc = trim(i['data']['selftext'])
 
 			tmp = f'[{title}]({link})\n'
-			if desc != '': tmp += f'{desc}\n'
+			if desc != '': tmp += desc + '\n'
 			tmp += f'Score: {score} Comments: {comments} Author: {author}\n\n'
 			if len(lst[-1].description) + len(tmp) > 1900:
 				lst[-1].description = lst[-1].description.strip()

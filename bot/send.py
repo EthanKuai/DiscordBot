@@ -40,7 +40,7 @@ async def p(ctx, messages, splitby: str = "\n"):
 				await ctx.send(line[i: i + MAX_LEN])
 
 
-def closestMatch(s: str, lst_in: list[str], /, splitby: str = ' '):
+def closestMatch(s: str, lst_in: list, /, splitby: str = ' '):
 	"""Finds closest item in list to string, uses splitby to split each phrase in list into words."""
 	lst = []
 	for i in lst_in: lst += [i.lower().split(splitby)]
@@ -83,17 +83,15 @@ def trim(string: str, maxlen: int = MAX_PARA):
 	out = ''
 
 	for i in range(len(lst_nolinks)+len(lst_links)):
-		if i%2: # nolinks
-			tmp = process_nolinks(lst_nolinks[i/2])
+		if i%2==0: # nolinks
+			out += process_nolinks(lst_nolinks[i//2])
 		else: # links
-			tmp = process_links(lst_links[i//2])
+			out += process_links(lst_links[i//2])
 
 		# overflow
-		if len(out) + len(tmp) > maxlen:
-			if i%2: out += tmp[:maxlen-len(out)]
-			else: out += tmp # hyperlink
-			out += '...'
-			break
+		if len(out) > maxlen:
+			if i%2==0: out = out[:maxlen] # does not end w hyperlink
+			return out + '...'
 
 	return out
 
