@@ -74,10 +74,13 @@ def trim(string: str, maxlen: int = MAX_PARA):
 		return re.sub(" +", " ", cleansed)
 
 	def process_links(s: str):
-		arr = s.split('](')
-		return arr[0] + '](' + arr[1].replace(' ','%20')
+		if s.startswith('http'): # link
+			return s
+		else: # hyperlink
+			arr = s.split('](')
+			return arr[0] + '](' + arr[1].replace(' ','%20')
 
-	LINK_RGX = '\[[\w ]*\]\(https*:\/\/[\w\.\/\?\& \-~:#\[\]@!\$\'\*\+,;%=]+\)' # retrieve hyperlinks
+	LINK_RGX = '\[[\w ]*\]\(https*:\/\/[\w\.\/\?\& \-~:#\[\]@!\$\'\*\+,;%=]+\)|https*:\/\/[\w\.\/\?\&\-~:#\[\]@!\$\'\*\+,;%=\(\)]+' # retrieve hyperlinks & links
 	lst_nolinks = re.split(LINK_RGX, string)
 	lst_links = re.findall(LINK_RGX, string)
 	out = ''
