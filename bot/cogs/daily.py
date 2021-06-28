@@ -67,9 +67,28 @@ class DailyCog(commands.Cog):
 
 
 	@daily_briefing.error
-	async def error_handle(self,error):
+	async def error_handle(self, error):
 		print(f'DailyCog: {error=}')
 		pass
+
+
+	@commands.command(aliases=ALIASES['daily']['timetable'])
+	async def timetable(self, ctx):
+		"""Sends timetable message set by each user."""
+		usr = ctx.message.author.id
+		for (userid, contents) in self.db.TIMETABLES:
+			if userid == usr:
+				p(ctx, contents)
+				return
+		p(ctx, "No timetable set! Use `.timetableset`")
+
+
+	@commands.command(aliases=ALIASES['daily']['timetableset'])
+	async def timetableset(self, ctx, *, contents: str = ""):
+		"""Sets timetable contents which bot will send upon command. Unique to each user."""
+		out = self.db.add_timetable(int(ctx.message.author.id), contents)
+		if out: ctx.reply("Timetable set!")
+		else: ctx.reply("Timetable set failed!")
 
 
 	def cog_unload(self):

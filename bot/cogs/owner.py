@@ -71,13 +71,11 @@ class OwnerCog(commands.Cog):
 			out = "**<Admin>** Channel information.\n"
 			out += f'**guild:**{ctx.guild}, **guild id:**{ctx.guild.id}\n'
 			out += f'**channel:**{ctx.channel}, **channel id:**{ctx.channel.id}\n'
-			out += f'**text channel list of guild:** {" ".join(ctx.guild.channels)}\n'
+			out += '**channel list:** '
+			out += " ".join([c.name for c in ctx.guild.channels]) + '\n'
 			out += f'**author:**{ctx.author}, **author id :**{ctx.author.id}\n'
-			out += '**member list of guild:**\n'
-			for m in ctx.guild.members:
-				out += f'({m}, {m.id}) '
-			out += '\n'
-
+			out += '**member list:** '
+			out += " ".join([f'({m}, {m.id})' for m in ctx.guild.members]) + '\n'
 			out += f'Functions of ctx: use command `dir(ctx)`'
 			await p(ctx, out)
 		except:
