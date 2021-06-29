@@ -78,9 +78,9 @@ class DailyCog(commands.Cog):
 		usr = ctx.message.author.id
 		for (userid, contents) in self.db.TIMETABLES:
 			if userid == usr:
-				p(ctx, contents)
+				await p(ctx, contents)
 				return
-		p(ctx, "No timetable set! Use `.timetableset`")
+		await p(ctx, "No timetable set! Use `.timetableset`")
 
 
 	@commands.command(aliases=ALIASES['daily']['timetableset'])
