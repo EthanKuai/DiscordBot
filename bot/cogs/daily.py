@@ -87,8 +87,8 @@ class DailyCog(commands.Cog):
 	async def timetableset(self, ctx, *, contents: str = ""):
 		"""Sets timetable contents which bot will send upon command. Unique to each user."""
 		out = self.db.add_timetable(int(ctx.message.author.id), contents)
-		if out: ctx.reply("Timetable set!")
-		else: ctx.reply("Timetable set failed!")
+		if out: await ctx.reply("Timetable set!")
+		else: await ctx.reply("Timetable set failed!")
 
 
 	def cog_unload(self):
