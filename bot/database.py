@@ -8,8 +8,7 @@ class db_accessor:
 
 	def __init__(self):
 		self._ENV_LST = ['TOKEN','GUILD_ID','DAILY_CHANNEL','DAILY_TIME','TZ_OFFSET','KEY_GOOGLE']
-		self._DB_LST = []#self._DB_LST = ['LINK_CNT','TIMETABLE_CNT']
-		self.add_variable_DB('TIMETABLE_CNT', 0)# !!!
+		self._DB_LST = ['LINK_CNT','TIMETABLE_CNT']
 		try:
 			for i in self._ENV_LST:
 				exec(f'self.{i} = os.environ["{i}"]')
@@ -21,8 +20,8 @@ class db_accessor:
 			print("db.__init__: Failed to read environmental variables & database")
 			exit()
 		self.tz = timezone(timedelta(hours=self.TZ_OFFSET))
-		#self._read_links()
-		#self._read_timetables()
+		self._read_links()
+		self._read_timetables()
 
 
 	def add_variable_ENV(self, name: str, val, strval: str = ""):
