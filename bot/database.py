@@ -58,12 +58,13 @@ class db_accessor:
 	def _read_timetables(self):
 		"""Read list of users & timetables from database."""
 		try:
-			self.TIMETABLES = []
+			self.TIMETABLES = {}
 			for i in range(self.TIMETABLE_CNT):
 				s = database[f'TIMETABLE{i}'] # <userid>|<contents>
 				index = s.find('|')
 				assert index != -1 # errors if '|' not found
-				self.TIMETABLES.append((s[:index], s[index+1:])) # (userid, contents)
+				assert s[:index].isdigit() # userid is integer
+				self.TIMETABLES[int(s[:index])] = s[index+1:] # TIMETABLES[userid] = contents
 		except:
 			print("db._read_timetables: Failed")
 			exit()
@@ -73,19 +74,22 @@ class db_accessor:
 		"""Overwrites list of users & timetables from database."""
 		try:
 			if len(self.TIMETABLES) != self.TIMETABLE_CNT:
-				raise IndexError("length of TIMETABLES list != TIMETABLE_CNT")
+				raise IndexError("length of TIMETABLES dict != TIMETABLE_CNT")
 			database['TIMETABLE_CNT'] = str(self.TIMETABLE_CNT)
-			for i in range(self.TIMETABLE_CNT):
-				tmp = str(self.TIMETABLES[i][0]) + '|' + self.TIMETABLES[i][1]
-				database[f'TIMETABLE{i}'] = tmp # <userid>|<contents>
+
+			i = 0
+			for key, val in self.TIMETABLES.items():
+				tmp = str(key) + '|' + val # <userid>|<contents>
+				database[f'TIMETABLE{i}'] = tmp
+				i += 1
 		except:
 			print("db._write_timetables: Failed to save timetables to database")
 
 
 	def add_timetable(self, userid: int, contents: str):
-		"""Append list of links."""
-		self.TIMETABLES.append((userid, contents))
-		self.TIMETABLE_CNT += 1
+		"""Adds or updates list of links, depending on whether it is a new userid."""
+		self.TIMETABLES[userid] = contents
+		self.TIMETABLE_CNT = len(self.TIMETABLES)
 		try:
 			self._write_timetables()
 		except:
@@ -136,9 +140,9 @@ class db_accessor:
 			self._write_links()
 			self._write_timetables()
 			for i in self._ENV_LST:
-				os.environ[i] = str(exec(f'self.{i}'))
+				os.environ[i] = str(eval(f'self.{i}'))
 			for i in self._DB_LST:
-				database[i] = str(exec(f'self.{i}'))
+				database[i] = str(eval(f'self.{i}'))
 		except:
 			print("db.update_data: Failed to update environmental variables")
 			exit()

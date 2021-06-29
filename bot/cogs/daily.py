@@ -78,7 +78,7 @@ class DailyCog(commands.Cog):
 		usr = ctx.message.author.id
 		for (userid, contents) in self.db.TIMETABLES:
 			if userid == usr:
-				await p(ctx, contents)
+				await ctx.reply(contents)
 				return
 		await p(ctx, "No timetable set! Use `.timetableset`")
 
