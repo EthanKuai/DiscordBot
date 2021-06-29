@@ -75,12 +75,11 @@ class DailyCog(commands.Cog):
 	@commands.command(aliases=ALIASES['daily']['timetable'])
 	async def timetable(self, ctx):
 		"""Sends timetable message set by each user."""
-		usr = ctx.message.author.id
-		for (userid, contents) in self.db.TIMETABLES:
-			if userid == usr:
-				await ctx.reply(contents)
-				return
-		await p(ctx, "No timetable set! Use `.timetableset`")
+		userid = ctx.message.author.id
+		if userid in self.db.TIMETABLES:
+			await ctx.reply(self.db.TIMETABLES[userid])
+		else:
+			await ctx.reply("No timetable set! Use `.timetableset`")
 
 
 	@commands.command(aliases=ALIASES['daily']['timetableset'])
