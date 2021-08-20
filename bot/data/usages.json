@@ -13,5 +13,9 @@
 	},
 	"wiki": {
 		"wiki": "<page> [\"full\"]"
+	},
+	"daily": {
+		"add": "<link>",
+		"remove": "<link>"
 	}
 }

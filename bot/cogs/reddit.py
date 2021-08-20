@@ -16,16 +16,23 @@ class RedditCog(commands.Cog):
 
 
 	@commands.command(usage=USAGES['reddit']['reddit'], aliases=ALIASES['reddit']['reddit'])
-	async def reddit(self, ctx,
-		sr: regex(antireg="\d|\s",maxlen=21),
-		cnt: text_or_int(REDDIT) = 5,
-		sortby: text_or_int(REDDIT, 0) = "day"
-	):
+	async def reddit(self, ctx, *, search: str):
 		"""Top x posts of a subreddit, default to sort by day."""
-		if isinstance(cnt, str):
-			sortby = cnt; cnt = 5
-		cnt = min(max(1, cnt),20)
+		sortby = "day"; cnt = 5; arr = search.split(' ')
+
+		if arr[-1] in REDDIT:
+			sortby = REDDIT[arr[-1]]
+			arr = arr[:-1]
+		if arr[-1].isnumeric():
+			cnt = int(arr[-1])
+			cnt = min(max(1, cnt),20)
+			arr = arr[:-1]
+
+		sr = '_'.join(arr)
+		if len(sr) > 21 or re.search('(^\d)|(^_)',sr):
+			raise commands.BadArgument("Invalid subreddit name")
 		if sr != "top": sr = 'r/' + sr
+
 		link = f'https://reddit.com/{sr}/top.json?sort=top&t={sortby}&limit={cnt}'
 		messages = await self.web_reddit(link)
 		await p(ctx, messages)
@@ -49,7 +56,7 @@ class RedditCog(commands.Cog):
 			score = i['data']['score']
 			comments = i['data']['num_comments']
 			author = trim(i['data']['author'], 27)
-			title = "**"+trim(i['data']['title'])+"**"
+			title = "**"+trim(i['data']['title']).replace("&amp","&")+"**"
 			desc = trim(i['data']['selftext'])
 
 			tmp = f'[{title}]({link})\n'

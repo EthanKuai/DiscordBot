@@ -2,8 +2,9 @@
 	"hi": ["hello","bonjour","ohayou","halo","nihao"],
 	"daily": {
 		"daily": ["dailybriefing"],
-		"timetable": ["schedule"],
-		"timetableset": ["timetable_set","scheduleset","schedule_set"]
+		"timetable": ["schedule", "tt"],
+		"timetableset": ["timetable_set","scheduleset","schedule_set"],
+		"list": ["show","all"]
 	},
 	"quote": {
 		"quote": ["saying","inspire","inspiration"]

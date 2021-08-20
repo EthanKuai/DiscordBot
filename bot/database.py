@@ -36,6 +36,8 @@ class db_accessor:
 			os.environ[name] = strval
 		except:
 			print("db.add_variable_ENV: Failed")
+		else:
+			return True
 
 
 	def add_variable_DB(self, name: str, val, strval: str = ""):
@@ -50,6 +52,8 @@ class db_accessor:
 			database[name] = strval
 		except:
 			print("db.add_variable_DB: Failed")
+		else:
+			return True
 
 
 	"""TODO: Probably both sets of methods can be condensed with enums, but I dont see an immediate need."""
@@ -68,6 +72,8 @@ class db_accessor:
 		except:
 			print("db._read_timetables: Failed")
 			exit()
+		else:
+			return True
 
 
 	def _write_timetables(self):
@@ -84,6 +90,8 @@ class db_accessor:
 				i += 1
 		except:
 			print("db._write_timetables: Failed to save timetables to database")
+		else:
+			return True
 
 
 	def add_timetable(self, userid: int, contents: str):
@@ -109,6 +117,8 @@ class db_accessor:
 		except:
 			print("db._read_links: Failed")
 			exit()
+		else:
+			return True
 
 
 	def _write_links(self):
@@ -121,6 +131,8 @@ class db_accessor:
 				database[f'LINK{i}'] = self.LINKS[i]
 		except:
 			print("db._write_links: Failed to save links to database")
+		else:
+			return True
 
 
 	def add_link(self, link: str):
@@ -131,6 +143,24 @@ class db_accessor:
 			self._write_links()
 		except:
 			print("db.add_link: Failed to add new link")
+		else:
+			return True
+
+
+	def remove_link(self, link: str):
+		"""Removes an existing link from list of links."""
+		link = link.strip()
+		if link in self.LINKS:
+			self.LINK_CNT -= 1
+			self.LINKS.remove(link)
+			try:
+				self._write_links()
+			except:
+				print("db.remove_link: Failed to remove existing link")
+			else:
+				return True
+		# non-existing link/ failed to remove existing link
+		return False
 
 
 	def update_data(self):
@@ -146,3 +176,5 @@ class db_accessor:
 		except:
 			print("db.update_data: Failed to update environmental variables")
 			exit()
+		else:
+			return True

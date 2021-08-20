@@ -20,8 +20,7 @@ class WikiCog(commands.Cog):
 		search = search.replace('_', ' ')
 
 		if search.endswith('full'):
-			search = ' '.join(search.split(' ')[:-1])
-			out = await self.web_wiki(search, True)
+			out = await self.web_wiki(search[:-5], True)
 		else:
 			out = await self.web_wiki(search)
 		await p(ctx, out)

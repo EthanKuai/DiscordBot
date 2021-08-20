@@ -8,6 +8,7 @@ from datetime import datetime
 import sys
 import asyncpg
 import asyncio
+from urllib.parse import urlparse
 
 
 class DailyCog(commands.Cog):
@@ -34,6 +35,61 @@ class DailyCog(commands.Cog):
 		return messages
 
 
+	@commands.group()
+	async def dailylinks(self, ctx):
+		pass
+
+
+	@dailylinks.command(usage=USAGES['daily']['add'])
+	async def add(self, ctx, new_link: str):
+		"""Adds a new non-existing link for daily briefing. Daily briefing will only display messages for recognised domains."""
+		# Validate url
+		o = urlparse(new_link)
+		if o.scheme not in ['http','https']: raise commands.BadArgument("Non-http link")
+
+		# ensure non-duplicate url
+		if new_link in self.db.LINKS: raise commands.BadArgument("Existing link!")
+
+		# save url
+		if self.db.add_link(new_link):
+			# successfully saved!
+			await ctx.reply("New link successfully added!")
+		else:
+			raise commands.BadArgument("Database save failed")
+
+
+	@add.error
+	async def add_error(self, ctx, error):
+		await p(ctx, error)
+		await badarguments(ctx, 'daily', 'add')
+
+
+	@dailylinks.command(usage=USAGES['daily']['remove'])
+	async def remove(self, ctx, link: str):
+		"""Removes one of existing links for daily briefing."""
+		if self.db.remove_link(link):
+			# successfully removed
+			await ctx.reply("Link successfully removed!")
+		else:
+			raise commands.BadArgument("Database save failed")
+
+
+	@remove.error
+	async def remove_error(self, ctx, error):
+		await badarguments(ctx, 'daily', 'remove')
+
+
+	@dailylinks.command(name="list", aliases=ALIASES['daily']['list'])
+	async def command_list(self, ctx):
+		"""Sends list of links used in daily briefing."""
+		embed = discord.Embed(
+			colour=discord.Colour.blurple(),
+			title = 'Daily Briefing Links',
+			description = '\n'.join(self.db.LINKS)
+		)
+		await p(ctx, embed)
+
+
 	@commands.command(aliases=ALIASES['daily']['daily'])
 	async def daily(self, ctx):
 		"""Your daily quotes and links, does not interrupt usual 24h daily briefing loop."""
@@ -47,8 +103,8 @@ class DailyCog(commands.Cog):
 			if ctx == None:
 				ctx = self.bot.get_guild(self.db.GUILD_ID).get_channel(self.db.DAILY_CHANNEL)
 			out = ["Your daily briefing up and coming!"]
-			out += await self.view_links()
 			out += [await self.quote.web_quote(-1)] # quote of the day
+			out += await self.view_links()
 			await p(ctx, out)
 
 
