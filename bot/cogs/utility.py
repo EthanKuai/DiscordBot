@@ -75,3 +75,19 @@ class UtilityCog(commands.Cog):
 	async def ping(self, ctx, precision: typing.Optional[int] = 3):
 		"""Bot latency test."""
 		await ctx.reply('Pong! Latency: {0}'.format(round(self.bot.latency, precision)))
+
+
+	@commands.command()
+	async def timezones(self, ctx):
+		"""Lists all timezones."""
+		desc = ""
+		for name, offset in TZ_DICT.items():
+			if offset > 0: desc += f"**{name}** (UTC+{offset}), "
+			elif offset == 0: desc += f"**{name}** (UTC), "
+			else: desc += f"**{name}** (UTC{offset}), "
+		out = discord.Embed(
+			title = "Timezones",
+			description = desc[:-2],
+			colour = discord.Colour.gold()
+		)
+		await p(ctx, out)

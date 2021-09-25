@@ -15,7 +15,9 @@
 		"wiki": "<page> [\"full\"]"
 	},
 	"daily": {
-		"add": "<link>",
-		"remove": "<link>"
+		"dl_add": "<link>",
+		"dl_remove": "<link>",
+		"dt_shift": "<no. hours to shift>",
+		"dt_timezone": "<timezone code/UTC offset>"
 	}
 }

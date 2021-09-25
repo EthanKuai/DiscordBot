@@ -1,10 +1,10 @@
 {
 	"hi": ["hello","bonjour","ohayou","halo","nihao"],
 	"daily": {
-		"daily": ["dailybriefing"],
+		"daily_command": ["dailybriefing"],
 		"timetable": ["schedule", "tt"],
 		"timetableset": ["timetable_set","scheduleset","schedule_set"],
-		"list": ["show","all"]
+		"dt_timezone": ["tz","zone"]
 	},
 	"quote": {
 		"quote": ["saying","inspire","inspiration"]

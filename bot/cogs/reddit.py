@@ -43,13 +43,16 @@ class RedditCog(commands.Cog):
 		await badarguments(ctx, 'reddit', 'reddit')
 
 
-	# reddit API, returns embed messages
 	async def web_reddit(self, link: str):
+		"""reddit API, returns embed messages"""
 		data = await self.web_bot.web_json(link)
 		data = data['data']['children']
 		sr = data[0]['data']['subreddit_name_prefixed']
-		lst = [discord.Embed(title=f"Reddit's top: {sr}",\
-			description = "", colour=discord.Colour.orange())]
+		lst = [discord.Embed(
+			title=f"Reddit's top: {sr}",
+			description = "",
+			colour=discord.Colour.orange() # change to color of subreddit.
+		)]
 
 		for i in data:
 			link = "https://reddit.com" + i['data']['permalink'].strip()

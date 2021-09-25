@@ -14,7 +14,7 @@ with open('bot/data/aliases.json') as f: ALIASES = json.load(f)
 async def badarguments(ctx, cog: str, name: str):
 	"""Helps format error messages when user keys in wrong arguments for a Discord command."""
 	out = 'Wrong arguments!\n'
-	out += f'**Arguments**: `.{name} {USAGES[cog][name]}`\n'
+	out += f'**Arguments**: `{USAGES[cog][name]}`\n' # .{name}, function name != command name
 	if cog in ALIASES:
 		if name in ALIASES[cog]:
 			out += f'**Aliases**: {", ".join(ALIASES[cog][name])}\n'

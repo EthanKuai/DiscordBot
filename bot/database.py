@@ -1,14 +1,18 @@
 from replit import db as database
 import os
 from datetime import timezone, timedelta
+from pandas import read_csv
+
+
+TZ_DICT = dict(read_csv("bot/data/timezones.csv").to_numpy())
 
 
 class db_accessor:
 	"""Accesses replit database."""
 
 	def __init__(self):
-		self._ENV_LST = ['TOKEN','GUILD_ID','DAILY_CHANNEL','DAILY_TIME','TZ_OFFSET','KEY_GOOGLE']
-		self._DB_LST = ['LINK_CNT','TIMETABLE_CNT']
+		self._ENV_LST = ['TOKEN','KEY_GOOGLE']
+		self._DB_LST = ['LINK_CNT','TIMETABLE_CNT','GUILD_ID','DAILY_CHANNEL','DAILY_TIME','TZ_OFFSET']
 		try:
 			for i in self._ENV_LST:
 				exec(f'self.{i} = os.environ["{i}"]')
