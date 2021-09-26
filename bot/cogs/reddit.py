@@ -36,7 +36,6 @@ class RedditCog(commands.Cog):
 		sr = '_'.join(arr)
 		if len(sr) > 21 or re.search('(^\d)|(^_)',sr):
 			raise commands.BadArgument("Invalid subreddit name")
-		if sr != "top": sr = 'r/' + sr
 
 		if sortby == "new":
 			link = f'https://reddit.com/{sr}/new.json?sort=top&limit={cnt}'
@@ -62,17 +61,19 @@ class RedditCog(commands.Cog):
 			colour=discord.Colour.orange() # change to color of subreddit.
 		)]
 		img = data[0]['data'].get('url_overridden_by_dest','')
-		if img != '': lst[0].set_image(url=img)
+		if len(img) > 4:
+			if img[-4:] in [".png", ".jpg", ".jpeg", ".svg", ".mp4"]:
+				lst[0].set_image(url=img)
 
 		for i in data:
 			link = "https://reddit.com" + i['data']['permalink'].strip()
 			score = i['data']['score']
 			comments = i['data']['num_comments']
 			author = trim(i['data']['author'], 27)
-			title = "**"+trim(i['data']['title']).replace("&amp","&")+"**"
+			title = trim(i['data']['title'])
 			desc = trim(i['data']['selftext'])
 
-			tmp = f'[{title}]({link})\n'
+			tmp = f'[**{title}**]({link})\n'
 			if desc != '': tmp += desc + '\n'
 			tmp += f'Score: {score} Comments: {comments} Author: {author}\n\n'
 			if len(lst[-1].description) + len(tmp) > 1900:

@@ -5,7 +5,7 @@ import re
 MAX_LEN = 1900 # discord message max length
 MAX_PARA = 165 # paragraph max len
 # .trim()
-_TRIM = [("*",""),("`",""),(">>> ",""),("%20"," "),("_"," "),("   "," "),("  "," "),("&amp;",""),("&gt;","")]
+_TRIM = [("*",""),("`",""),("[",""),("]",""),("(",""),(")",""),(">>> ",""),("%20"," "),("_"," "),("   "," "),("  "," "),("&amp;",""),("&amp","&"),("&gt;","")]
 _TRIM_LINK = [(" ","%20"),("amp;","")]
 with open('bot/data/usages.json') as f: USAGES = json.load(f)
 with open('bot/data/aliases.json') as f: ALIASES = json.load(f)
@@ -97,5 +97,5 @@ def trim(string: str, maxlen: int = MAX_PARA):
 			if i%2==0: out = out[:maxlen] # does not end w link
 			return out + '...'
 
-	return out
+	return out.strip()
 

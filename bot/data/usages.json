@@ -3,7 +3,7 @@
 		"quote": "[\"qotd\"/number=1]"
 	},
 	"reddit": {
-		"reddit": "<subreddit/\"top\"> [posts=5] [sortby=\"day\"/\"now\"/\"hour\"/\"week\"/\"month\"/\"year\"/\"all\"/\"new\"]"
+		"reddit": "<subreddit> [posts=5] [sortby=\"day\"/\"now\"/\"hour\"/\"week\"/\"month\"/\"year\"/\"all\"/\"new\"]"
 	},
 	"utility": {
 		"echo": "[number of messages=1-5] <message content>",
