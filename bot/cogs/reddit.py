@@ -38,9 +38,9 @@ class RedditCog(commands.Cog):
 			raise commands.BadArgument("Invalid subreddit name")
 
 		if sortby == "new":
-			link = f'https://reddit.com/{sr}/new.json?sort=top&limit={cnt}'
+			link = f'https://reddit.com/r/{sr}/new.json?sort=top&limit={cnt}'
 		else:
-			link = f'https://reddit.com/{sr}/top.json?sort=top&t={sortby}&limit={cnt}'
+			link = f'https://reddit.com/r/{sr}/top.json?sort=top&t={sortby}&limit={cnt}'
 		messages = await self.web_reddit(link)
 		await p(ctx, messages)
 
