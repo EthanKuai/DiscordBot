@@ -38,8 +38,9 @@ class DailyCog(commands.Cog):
 
 	# also a standard command
 	@commands.group(name='daily', aliases=ALIASES['daily']['daily_command'], invoke_without_command=True)
-	async def daily_CG(self, ctx):
+	async def daily_CG(self, ctx, *args):
 		"""Your daily quotes and links, does not interrupt usual 24h daily briefing loop."""
+		if len(args) == 0: pass # no args given to children commands
 		await self.daily_loop(ctx)
 
 
@@ -49,19 +50,18 @@ class DailyCog(commands.Cog):
 	@tasks.loop(hours=24.0, minutes = 0.0)
 	async def daily_loop(self, ctx = None, *args):
 		"""daily briefing every 24h at set time"""
-		if len(args) != 0: pass # no args given to children commands
-		async with self.lock:
-			if ctx == None:
-				ctx = self.bot.get_guild(self.db.GUILD_ID).get_channel(self.db.DAILY_CHANNEL)
-			out = ["Your daily briefing up and coming!"]
-			out += [await self.quote.web_quote(-1)] # quote of the day
-			out += await self._database_get_links()
-			await p(ctx, out)
-
-
-	@daily_loop.error
-	async def daily_loop_error(self, error):
-		print(f'DailyCog: {error=}')
+		try:
+			async with self.lock:
+				if ctx == None:
+					ctx = self.bot.get_guild(self.db.GUILD_ID).get_channel(self.db.DAILY_CHANNEL)
+				out = ["Your daily briefing up and coming!"]
+				out += [await self.quote.web_quote(-1)] # quote of the day
+				out += await self._database_get_links()
+				await p(ctx, out)
+		except Exception as error:
+			print(f'DailyCog: {error=}')
+			if ctx != None:
+				await p(ctx, "Daily briefing has run into an error!")
 
 
 	@daily_loop.before_loop
@@ -88,7 +88,7 @@ class DailyCog(commands.Cog):
 	@daily_CG.group(name='links', invoke_without_command=True)
 	async def dl_CG(self, ctx, *args):
 		"""List of links used in daily briefing."""
-		if len(args) != 0: pass # no args given to children commands
+		if len(args) == 0: pass # no args given to children commands
 		embed = discord.Embed(
 			colour=discord.Colour.blurple(),
 			title = 'Daily Briefing Links',
