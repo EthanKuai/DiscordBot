@@ -38,4 +38,4 @@ class web_accessor:
 				data = self.session.get(url=url, headers=headers, params=params)
 			return data.json()
 		except Exception as e:
-			print(f"web_json exception {url=}, {params]}\n{e=}")
+			print(f"web_json exception {url=}, {params=}\n{e=}")

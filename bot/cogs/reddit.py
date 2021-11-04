@@ -14,7 +14,7 @@ class RedditCog(commands.Cog):
 	def __init__(self, bot: commands.bot, web_bot: web_accessor):
 		self.bot = bot
 		self.web_bot = web_bot
-		self.MAX_POSTS_INDIV = 12
+		self.MAX_POSTS_INDIV = 16
 		self.MAX_POSTS = 32
 		self.reddit_logo = "https://logodownload.org/wp-content/uploads/2018/02/reddit-logo-16.png"
 
