@@ -10,7 +10,6 @@ class OwnerCog(commands.Cog):
 
 	def __init__(self, bot: commands.bot):
 		self.bot = bot
-		print(sys.argv[0] + ' being loaded!')
 
 	# Won't show up on the default help.
 	@commands.command(name='_load', hidden=True)
@@ -50,7 +49,10 @@ class OwnerCog(commands.Cog):
 	async def send_embed(self, ctx, *, arg: str):
 		"""Input dictionary args for embed message"""
 		try:
-			await ctx.send(embed = eval(f'discord.Embed({arg})'))
+			if arg.startswith('discord.Embed'):
+				await ctx.send(embed = eval(arg))
+			else:
+				await ctx.send(embed = eval(f'discord.Embed({arg})'))
 		except:
 			await ctx.send("failed.")
 

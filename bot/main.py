@@ -34,7 +34,8 @@ bot_cogs = {'owner':OwnerCog(bot),
 			'reddit':RedditCog(bot, web_bot),
 			'wiki':WikiCog(bot, web_bot),
 			'quote':QuoteCog(bot, web_bot),
-			'singapore':SingaporeCog(bot)
+			'singapore':SingaporeCog(bot),
+			'twitter':TwitterCog(bot)
 }
 bot_cogs['daily'] = DailyCog(bot, db, bot_cogs['reddit'], bot_cogs['quote'])
 if __name__ == '__main__':

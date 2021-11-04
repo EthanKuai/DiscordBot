@@ -6,3 +6,5 @@ asyncpg
 asyncio
 requests
 typing
+pandas
+disputils

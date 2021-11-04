@@ -12,7 +12,8 @@
 		"ping": "[decimal place precision=3]"
 	},
 	"wiki": {
-		"wiki": "<page> [\"full\"]"
+		"wiki": "<page> [lang=\"en\"]",
+		"wikisearch": "<search term> [lang=\"EN\"]"
 	},
 	"daily": {
 		"dl_add": "<link>",

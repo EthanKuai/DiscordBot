@@ -12,7 +12,6 @@ class QuoteCog(commands.Cog):
 	def __init__(self, bot: commands.bot, web_bot: web_accessor):
 		self.bot = bot
 		self.web_bot = web_bot
-		print(sys.argv[0] + ' being loaded!')
 		self.QUOTES = []
 
 

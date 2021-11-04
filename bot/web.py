@@ -31,8 +31,11 @@ class web_accessor:
 		"""Reads & returns json of url [requests package]."""
 		headers = {'User-agent': self._random_str()} # random user-agent
 
-		if not params:
-			data = self.session.get(url=url, headers=headers)
-		else:
-			data = self.session.get(url=url, headers=headers, params=params)
-		return data.json()
+		try:
+			if not params:
+				data = self.session.get(url=url, headers=headers)
+			else:
+				data = self.session.get(url=url, headers=headers, params=params)
+			return data.json()
+		except Exception as e:
+			print(f"web_json exception {url=}, {params]}\n{e=}")

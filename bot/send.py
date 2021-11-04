@@ -5,8 +5,8 @@ import re
 MAX_LEN = 1900 # discord message max length
 MAX_PARA = 165 # paragraph max len
 # .trim()
-_TRIM = [("*",""),("`",""),("[",""),("]",""),("(",""),(")",""),(">>> ",""),("%20"," "),("_"," "),("   "," "),("  "," "),("&amp;",""),("&amp","&"),("&gt;","")]
-_TRIM_LINK = [(" ","%20"),("amp;","")]
+_TRIM = [("*",""),("`",""),(">>> ",""),("%20"," "),("_"," "),("   "," "),("  "," "),("&amp;",""),("&amp","&"),("&gt;","")]
+_TRIM_LINK = [(" ","%20"),("amp;",""),("[",""),("]",""),("(",""),(")","")]
 with open('bot/data/usages.json') as f: USAGES = json.load(f)
 with open('bot/data/aliases.json') as f: ALIASES = json.load(f)
 
@@ -38,7 +38,7 @@ async def p(ctx, messages, splitby: str = "\n"):
 			elif len(line) < MAX_LEN: # short line
 				await ctx.send(line)
 				continue
-			for i in range(0, len(line)+MAX_LEN-1, MAX_LEN): # long line
+			for i in range(0, len(line)-1, MAX_LEN): # long line
 				await ctx.send(line[i: i + MAX_LEN])
 
 
@@ -79,7 +79,8 @@ def trim(string: str, maxlen: int = MAX_PARA):
 		else: # hyperlink
 			arr = s.split('](')
 			for i, j in _TRIM_LINK: arr[2] = arr[2].replace(i, j)
-			return arr[0] + '](' + arr[2]
+			arr[2] = arr[2].trim()[:-1]
+			return '[' + arr[0] + ']( ' + arr[2] + ' )'
 
 	LINK_RGX = '\[[\w ]*\]\(https*:\/\/[\w\.\/\?\& \-~:#\[\]@!\$\'\*\+,;%=]+\)|https*:\/\/[\w\.\/\?\&\-~:#\[\]@!\$\'\*\+,;%=\(\)]+' # retrieve hyperlinks & links
 	lst_nolinks = re.split(LINK_RGX, string)

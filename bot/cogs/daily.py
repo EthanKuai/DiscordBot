@@ -20,7 +20,6 @@ class DailyCog(commands.Cog):
 		self.db = db
 		self.reddit = reddit
 		self.quote = quote
-		print(sys.argv[0] + ' being loaded!')
 		self.lock = asyncio.Lock()
 		self.daily_loop.add_exception_type(asyncpg.PostgresConnectionError)
 		self.daily_loop.start()
@@ -108,8 +107,9 @@ class DailyCog(commands.Cog):
 
 		# save url
 		if self.db.add_link(new_link):
-			await ctx.reply("New link successfully added!")
+			await ctx.message.add_reaction("✅")
 		else:
+			await ctx.message.add_reaction("❎")
 			raise commands.BadArgument("Database save failed")
 
 
@@ -123,8 +123,9 @@ class DailyCog(commands.Cog):
 	async def dl_remove(self, ctx, link: str):
 		"""Removes one of existing links for daily briefing."""
 		if self.db.remove_link(link):
-			await ctx.reply("Link successfully removed!")
+			await ctx.message.add_reaction("✅")
 		else:
+			await ctx.message.add_reaction("❎")
 			raise commands.BadArgument("Database save failed")
 
 
@@ -188,5 +189,5 @@ class DailyCog(commands.Cog):
 	async def timetableset(self, ctx, *, contents: str = ""):
 		"""Sets timetable contents which bot will send upon command. Unique to each user."""
 		out = self.db.add_timetable(int(ctx.message.author.id), contents)
-		if out: await ctx.reply("Timetable set!")
-		else: await ctx.reply("Timetable set failed!")
+		if out: await ctx.message.add_reaction("✅")
+		else: await ctx.message.add_reaction("❎")
