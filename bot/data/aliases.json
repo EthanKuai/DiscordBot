@@ -2,8 +2,10 @@
 	"hi": ["hello","bonjour","ohayou","halo","nihao"],
 	"daily": {
 		"daily_command": ["dailybriefing"],
-		"timetable": ["schedule", "tt"],
-		"timetableset": ["timetable_set","scheduleset","schedule_set"],
+		"timetable": ["schedule","tt"],
+		"timetableset": ["timetable_set","scheduleset","schedule_set","ttset","tt_set"],
+		"timetableadd": ["timetable_add","scheduleadd","schedule_add","ttadd","tt_add"],
+		"timetableremove": ["timetable_remove","scheduleremove","schedule_remove","ttremove","tt_remove","timetable_delete","scheduledelete","schedule_delete","ttdelete","tt_delete"],
 		"dt_timezone": ["tz","zone"]
 	},
 	"quote": {

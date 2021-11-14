@@ -29,15 +29,17 @@ db = db_accessor()
 web_bot = web_accessor()
 
 # cogs
-bot_cogs = {'owner':OwnerCog(bot),
-			'utility':UtilityCog(bot),
-			'reddit':RedditCog(bot, web_bot),
-			'wiki':WikiCog(bot, web_bot),
-			'quote':QuoteCog(bot, web_bot),
-			'singapore':SingaporeCog(bot),
-			'twitter':TwitterCog(bot)
+bot_cogs = {
+	'owner':OwnerCog(bot, db),
+	'utility':UtilityCog(bot),
+	'reddit':RedditCog(bot, web_bot),
+	'wiki':WikiCog(bot, web_bot),
+	'quote':QuoteCog(bot, web_bot),
+	'singapore':SingaporeCog(bot),
+	'twitter':TwitterCog(bot),
+	'timetable':TimetableCog(bot, db)
 }
-bot_cogs['daily'] = DailyCog(bot, db, bot_cogs['reddit'], bot_cogs['quote'])
+bot_cogs['daily'] = DailyCog(bot, db, bot_cogs['reddit'], bot_cogs['quote'], bot_cogs['wiki'])
 if __name__ == '__main__':
 	for i in bot_cogs.values():
 		bot.add_cog(i)

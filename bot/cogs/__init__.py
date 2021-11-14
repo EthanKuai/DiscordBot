@@ -8,3 +8,4 @@ from .utility import *
 from .gnews import *
 from .singapore import *
 from .twitter import *
+from .timetable import *

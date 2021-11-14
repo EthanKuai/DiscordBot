@@ -4,33 +4,39 @@ from discord.ext import commands, tasks
 from bot import *
 from .reddit import RedditCog
 from .quote import QuoteCog
+from .wiki import WikiCog
 from datetime import datetime
-import sys
 import asyncpg
 import asyncio
 from urllib.parse import urlparse
-import typing
+import re
+from disputils import BotEmbedPaginator
 
 
 class DailyCog(commands.Cog):
 	"""Daily Briefing"""
 
-	def __init__(self, bot: commands.bot, db: db_accessor, reddit: RedditCog, quote: QuoteCog):
+	def __init__(self, bot: commands.bot, db: db_accessor, reddit: RedditCog, quote: QuoteCog, wiki: WikiCog):
 		self.bot = bot
 		self.db = db
 		self.reddit = reddit
 		self.quote = quote
+		self.wiki = wiki
 		self.lock = asyncio.Lock()
 		self.daily_loop.add_exception_type(asyncpg.PostgresConnectionError)
 		self.daily_loop.start()
 
 
-	async def _database_get_links(self):
+	async def _database_get_links(self, indiv_posts: bool = False):
 		"""scans through links in database, if has known API, reads & outputs message"""
 		messages = []
 		for link in self.db.LINKS:
-			if link.startswith("https://www.reddit.com"): out = await self.reddit.web_reddit(link)
-			else: print(f'handler.read_link: {link=} does not match any known APIs!')
+			if link.startswith("https://www.reddit.com"):
+				out = await self.reddit.web_reddit(link, indiv_posts = indiv_posts)
+			elif re.search('https://[a-z]+.wikipedia.org/wiki/', link):
+				out = await self.wiki.web_wiki(link, indiv_posts = indiv_posts)
+			else:
+				print(f'handler.read_link: {link=} does not match any known APIs!')
 			for m in out: messages.append(m)
 		return messages
 
@@ -39,7 +45,7 @@ class DailyCog(commands.Cog):
 	@commands.group(name='daily', aliases=ALIASES['daily']['daily_command'], invoke_without_command=True)
 	async def daily_CG(self, ctx, *args):
 		"""Your daily quotes and links, does not interrupt usual 24h daily briefing loop."""
-		if len(args) == 0: pass # no args given to children commands
+		if len(args) == 0: pass # happens when no args given to children commands
 		await self.daily_loop(ctx)
 
 
@@ -51,16 +57,25 @@ class DailyCog(commands.Cog):
 		"""daily briefing every 24h at set time"""
 		try:
 			async with self.lock:
-				if ctx == None:
-					ctx = self.bot.get_guild(self.db.GUILD_ID).get_channel(self.db.DAILY_CHANNEL)
 				out = ["Your daily briefing up and coming!"]
 				out += [await self.quote.web_quote(-1)] # quote of the day
-				out += await self._database_get_links()
-				await p(ctx, out)
+				if ctx == None:
+					# time-triggered
+					ctx = self.bot.get_guild(self.db.GUILD_ID).get_channel(self.db.DAILY_CHANNEL)
+					out += await self._database_get_links()
+					await p(ctx, out)
+				else:
+					# message-triggered
+					out += await self._database_get_links(indiv_posts = True)
+					await p(ctx, out[:2])
+					paginator = BotEmbedPaginator(ctx, out[2:])
+					await paginator.run(timeout = 400)
 		except Exception as error:
-			print(f'DailyCog: {error=}')
-			if ctx != None:
-				await p(ctx, "Daily briefing has run into an error!")
+			if ctx != None: await p(ctx, "Daily briefing has run into an error!")
+			owner = await self.bot.application_info().owner
+			if owner != None:
+				await owner.send('Daily briefing has run into an error')
+				await owner.send(f'{error=}')
 
 
 	@daily_loop.before_loop
@@ -170,24 +185,3 @@ class DailyCog(commands.Cog):
 	@dt_timezone.error
 	async def dt_timezone_error(self, ctx, error):
 		await badarguments(ctx, 'daily', 'dt_timezone')
-
-
-	"""----------------------------- timetable/ schedule -----------------------------"""
-
-
-	@commands.command(aliases=ALIASES['daily']['timetable'])
-	async def timetable(self, ctx):
-		"""Sends timetable message set by each user."""
-		userid = ctx.message.author.id
-		if userid in self.db.TIMETABLES:
-			await ctx.reply(self.db.TIMETABLES[userid])
-		else:
-			await ctx.reply("No timetable set! Use `.timetableset`")
-
-
-	@commands.command(aliases=ALIASES['daily']['timetableset'])
-	async def timetableset(self, ctx, *, contents: str = ""):
-		"""Sets timetable contents which bot will send upon command. Unique to each user."""
-		out = self.db.add_timetable(int(ctx.message.author.id), contents)
-		if out: await ctx.message.add_reaction("✅")
-		else: await ctx.message.add_reaction("❎")

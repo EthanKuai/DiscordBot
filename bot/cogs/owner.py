@@ -8,8 +8,9 @@ import sys
 class OwnerCog(commands.Cog):
 	"""Debugging commands only for owner :)"""
 
-	def __init__(self, bot: commands.bot):
+	def __init__(self, bot: commands.bot, db: db_accessor):
 		self.bot = bot
+		self.db = db
 
 	# Won't show up on the default help.
 	@commands.command(name='_load', hidden=True)
@@ -101,5 +102,17 @@ class OwnerCog(commands.Cog):
 		"""!!Warning!! Executes given statement"""
 		try:
 			await ctx.send(exec(arg))
+		except:
+			await ctx.send("failed.")
+
+	@commands.command(name='_database', hidden=True)
+	@commands.is_owner()
+	async def debug_database(self, ctx, *, arg: str):
+		"""!!Warning!! Dumps database info"""
+		try:
+			if arg=="confirm": # extra preventive measure
+				await p(ctx, '```' + str(vars(self.db)).replace("`","\`") + '```')
+			else:
+				await ctx.send("Unconfirmed! Execute this in private channel.")
 		except:
 			await ctx.send("failed.")

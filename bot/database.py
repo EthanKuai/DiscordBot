@@ -12,7 +12,7 @@ class db_accessor:
 
 	def __init__(self):
 		self._ENV_LST = ['TOKEN','KEY_GOOGLE']
-		self._DB_LST = ['LINK_CNT','TIMETABLE_CNT','GUILD_ID','DAILY_CHANNEL','DAILY_TIME','TZ_OFFSET']
+		self._DB_LST = ['LINK_CNT','GUILD_ID','DAILY_CHANNEL','DAILY_TIME','TZ_OFFSET']
 		try:
 			for i in self._ENV_LST:
 				exec(f'self.{i} = os.environ["{i}"]')
@@ -20,8 +20,9 @@ class db_accessor:
 			for i in self._DB_LST:
 				exec(f'self.{i} = database["{i}"]')
 				if eval(f'self.{i}').isnumeric(): exec(f'self.{i} = int(self.{i})')
-		except:
+		except Exception as e:
 			print("db.__init__: Failed to read environmental variables & database")
+			print(e)
 			exit()
 		self.tz = timezone(timedelta(hours=self.TZ_OFFSET))
 		self._read_links()
@@ -61,20 +62,27 @@ class db_accessor:
 
 
 	"""TODO: Probably both sets of methods can be condensed with enums, but I dont see an immediate need."""
+	"""-------------------------------- timetable --------------------------------"""
 
 
 	def _read_timetables(self):
 		"""Read list of users & timetables from database."""
+		self.TIMETABLES = {}
+		self.TIMETABLEIMGS = {}
 		try:
-			self.TIMETABLES = {}
-			for i in range(self.TIMETABLE_CNT):
-				s = database[f'TIMETABLE{i}'] # <userid>|<contents>
+			# find all matches to 'TIMETABLEX<userid>'
+			user_ids = [int(s[10:]) for s in database.prefix("TIMETABLEX")]
+			# database['TIMETABLEX<userid>'] = <img_url>|<contents>
+			for user_id in user_ids:
+				s = database[f'TIMETABLEX{user_id}']
 				index = s.find('|')
 				assert index != -1 # errors if '|' not found
-				assert s[:index].isdigit() # userid is integer
-				self.TIMETABLES[int(s[:index])] = s[index+1:] # TIMETABLES[userid] = contents
-		except:
+				assert s[:index] == "" or s[:index].startswith("http")
+				self.TIMETABLES[user_id] = s[index+1:] # TIMETABLES[userid] = contents
+				self.TIMETABLEIMGS[user_id] = s[:index] # TIMETABLES[userid] = img_url
+		except Exception as e:
 			print("db._read_timetables: Failed")
+			print(e)
 			exit()
 		else:
 			return True
@@ -83,31 +91,27 @@ class db_accessor:
 	def _write_timetables(self):
 		"""Overwrites list of users & timetables from database."""
 		try:
-			if len(self.TIMETABLES) != self.TIMETABLE_CNT:
-				raise IndexError("length of TIMETABLES dict != TIMETABLE_CNT")
-			database['TIMETABLE_CNT'] = str(self.TIMETABLE_CNT)
-
-			i = 0
-			for key, val in self.TIMETABLES.items():
-				tmp = str(key) + '|' + val # <userid>|<contents>
-				database[f'TIMETABLE{i}'] = tmp
-				i += 1
+			for user_id, content in self.TIMETABLES.items():
+				database[f'TIMETABLEX{user_id}'] = self.TIMETABLEIMGS[user_id] + '|' + content
 		except:
 			print("db._write_timetables: Failed to save timetables to database")
 		else:
 			return True
 
 
-	def add_timetable(self, userid: int, contents: str):
+	def add_timetable(self, userid: int, contents: str, *, updated_img: str = None):
 		"""Adds or updates list of links, depending on whether it is a new userid."""
-		self.TIMETABLES[userid] = contents
-		self.TIMETABLE_CNT = len(self.TIMETABLES)
 		try:
+			self.TIMETABLES[userid] = contents
+			if updated_img != None: self.TIMETABLEIMGS[userid] = updated_img
 			self._write_timetables()
 		except:
 			print("db.add_timetable: Failed to add new timetable")
 		else:
 			return True
+
+
+	"""-------------------------------- daily briefing links --------------------------------"""
 
 
 	def _read_links(self):
@@ -118,8 +122,9 @@ class db_accessor:
 				s = database[f'LINK{i}']
 				assert s.startswith('http') # errors if not link
 				self.LINKS.append(s)
-		except:
+		except Exception as e:
 			print("db._read_links: Failed")
+			print(e)
 			exit()
 		else:
 			return True

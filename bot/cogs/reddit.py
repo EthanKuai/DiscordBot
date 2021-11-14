@@ -14,7 +14,7 @@ class RedditCog(commands.Cog):
 	def __init__(self, bot: commands.bot, web_bot: web_accessor):
 		self.bot = bot
 		self.web_bot = web_bot
-		self.MAX_POSTS_INDIV = 16
+		self.MAX_POSTS_INDIV = 18
 		self.MAX_POSTS = 32
 		self.reddit_logo = "https://logodownload.org/wp-content/uploads/2018/02/reddit-logo-16.png"
 
@@ -39,7 +39,8 @@ class RedditCog(commands.Cog):
 		if len(sr) > 21 or re.search('(^\d)|(^_)',sr):
 			raise commands.BadArgument("Invalid subreddit name")
 
-		if sr == "top":
+		if sr in ["top", "main", "reddit"]:
+			sr = "top"
 			link = f'https://www.reddit.com/top.json?sort=top&t={sortby}&limit={cnt}'
 		elif sortby == "new":
 			link = f'https://reddit.com/r/{sr}/new.json?sort=top&limit={cnt}'
@@ -61,15 +62,15 @@ class RedditCog(commands.Cog):
 
 	async def web_reddit(self, link: str, *, indiv_posts: bool = False, top: bool = False):
 		"""reddit API, returns embed messages"""
+		imgs = [] # valid image links
+		lst = [""] # segmented description for main embed
 		try:
 			data = await self.web_bot.web_json(link)
 			data = data['data']['children']
 
 			# for main embed
-			imgs = [] # valid image links
-			lst = [""] # segmented description for main embed
 			if top:
-				sr_main = 'top'
+				sr_main = 'Top posts reddit-wide'
 				link_main = f"https://www.reddit.com/"
 			else:
 				sr_main = data[0]['data']['subreddit_name_prefixed']
@@ -81,13 +82,14 @@ class RedditCog(commands.Cog):
 				link = "https://reddit.com" + i['data']['permalink'].strip()
 				score = i['data']['score']
 				comments = i['data']['num_comments']
-				author = trim(i['data']['author'], 27)
+				author = trim(i['data']['author'], MAX_FIELD)
 				title = trim(i['data']['title'])
 				desc = trim(i['data']['selftext'])
-				img = i['data'].get('url_overridden_by_dest','')
-				if len(img) > 4 and img[-4:] in [".png", ".jpg", ".jpeg", ".svg", ".mp4"]: imgs.append(img)
-				else: img = ""
 				sr = i['data']['subreddit_name_prefixed']
+				# img, to append to imgs if valid
+				img = i['data'].get('url_overridden_by_dest','')
+				if len(img) > 4 and img[-4:] in IMG_TYPES: imgs.append(img)
+				else: img = ""
 
 				# formatting indiv embed
 				if indiv_posts:
@@ -112,18 +114,19 @@ class RedditCog(commands.Cog):
 					if desc != '':
 						indiv_embeds[-1].add_field(
 							name = "Description",
-							value = trim(i['data']['selftext'], MAX_LEN),
+							value = trim(i['data']['selftext'], MAX_FIELD),
 							inline = False
 						)
 
 				# formatting main embed
-				tmp = f'[**{title}**]({link})\n'
+				tmp = process_links(f'[**{title}**]({link} )') + '\n'
 				if desc != '': tmp += desc + '\n'
 				tmp += f'Score: {score} Comments: {comments} Author: {author}\n\n'
 
 				if len(lst[-1]) + len(tmp) > MAX_LEN: lst.append(tmp)
 				else: lst[-1] = lst[-1] + tmp
 
+			imgs += [""] * len(lst)
 			main_embeds = [
 				discord.Embed(
 					title = sr_main,
@@ -132,13 +135,12 @@ class RedditCog(commands.Cog):
 					colour = discord.Colour.orange() # change to color of subreddit.
 				)
 				.set_author(name = "Reddit", icon_url = self.reddit_logo)
+				.set_image(url=imgs.pop(0))
 				for x in lst
 			]
-			imgs.append("")
-			main_embeds[0].set_image(url=imgs[0])
 
 			if indiv_posts: main_embeds += indiv_embeds
 			return main_embeds
 
 		except Exception as e:
-			print(f"web_reddit exception {link=}\n{e=}")
+			print(f"web_reddit exception {link=}\n{e=}\n{lst=}")
