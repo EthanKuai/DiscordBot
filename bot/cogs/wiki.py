@@ -112,13 +112,13 @@ class WikiCog(commands.Cog):
 	async def web_wiki_search(self, search: str, lang: str):
 		api_url = f'https://{lang}.wikipedia.org/w/api.php'
 		# get closest wiki page
-		search = search.replace("%20", " ").replace("_", " ")
+		search = search.replace("_", "%20").replace("&", "%20")
 		search_params = {
 			"action": "opensearch",
 			"format": "json",
 			"search": search
 		}
-		search_json = await self.web_bot.web_json(api_url, search_params)
+		search_json = await self.web_bot.web_json(api_url, params = search_params)
 		# (title, url)
 		results = [(search_json[1][i],search_json[3][i]) for i in range(len(search_json[1]))]
 		return results
@@ -141,7 +141,7 @@ class WikiCog(commands.Cog):
 			"explaintext": "", # no html formatting
 			"redirects": 1
 		}
-		info_json = await self.web_bot.web_json(api_url, info_params)
+		info_json = await self.web_bot.web_json(api_url, params = info_params)
 		info_json = info_json['query']['pages']
 		# info_json.keys() has 1 item, being the pageid
 		for i in info_json.keys(): info_json = info_json[i]
@@ -157,7 +157,7 @@ class WikiCog(commands.Cog):
 			"pithumbsize": "500"
 		}
 		try:
-			icon_json = await self.web_bot.web_json(api_url, icon_params)
+			icon_json = await self.web_bot.web_json(api_url, params = icon_params)
 			icon_json = icon_json['query']['pages']
 			# icon_json.keys() has 1 item, being the pageid
 			for i in icon_json.keys(): icon_json = icon_json[i]

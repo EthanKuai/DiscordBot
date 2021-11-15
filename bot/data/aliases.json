@@ -21,5 +21,9 @@
 	"wiki": {
 		"wiki": ["w","wikipedia","encyclopedia"],
 		"wikisearch": ["ws","wsearch","wikipediasearch","encyclopediasearch"]
+	},
+	"google": {
+		"google": ["g","googlesearch","google_search"],
+		"googleimage": ["gimage","google_image","googlei"]
 	}
 }

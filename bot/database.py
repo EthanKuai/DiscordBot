@@ -11,7 +11,7 @@ class db_accessor:
 	"""Accesses replit database."""
 
 	def __init__(self):
-		self._ENV_LST = ['TOKEN','KEY_GOOGLE']
+		self._ENV_LST = ['TOKEN','GOOGLE_API_ID','GOOGLE_API_KEY','GOOGLE_CLIENTID','GOOGLE_CLIENTSECRET']
 		self._DB_LST = ['LINK_CNT','GUILD_ID','DAILY_CHANNEL','DAILY_TIME','TZ_OFFSET']
 		try:
 			for i in self._ENV_LST:

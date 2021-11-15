@@ -9,8 +9,9 @@ import twint
 class TwitterCog(commands.Cog):
 	"""Twitter API"""
 
-	def __init__(self, bot: commands.bot):
+	def __init__(self, bot: commands.bot, web_bot: web_accessor):
 		self.bot = bot
+		self.web_bot = web_bot
 		self.c = twint.Config()
 
 	@commands.command()

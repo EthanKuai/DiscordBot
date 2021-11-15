@@ -135,7 +135,7 @@ class RedditCog(commands.Cog):
 					colour = discord.Colour.orange() # change to color of subreddit.
 				)
 				.set_author(name = "Reddit", icon_url = self.reddit_logo)
-				.set_image(url=imgs.pop(0))
+				.set_image(url = imgs.pop(0))
 				for x in lst
 			]
 

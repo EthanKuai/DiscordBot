@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 
 from bot import *
-import sys
+from disputils import BotEmbedPaginator
 
 
 class TemplateCog(commands.Cog):

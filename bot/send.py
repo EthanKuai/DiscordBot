@@ -80,7 +80,7 @@ def process_nolinks(s: str):
 
 def process_links(s: str):
 	if s.startswith('http'): # link
-		return s
+		return s.replace(" ","%20")
 	else: # hyperlink
 		arr = s.split('](')
 		arr[1] = arr[1][:-1].strip()

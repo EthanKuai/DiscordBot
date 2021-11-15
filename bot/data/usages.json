@@ -20,5 +20,8 @@
 		"dl_remove": "<link>",
 		"dt_shift": "<no. hours to shift>",
 		"dt_timezone": "<timezone code/UTC offset>"
+	},
+	"google": {
+		"google": "<search term>"
 	}
 }

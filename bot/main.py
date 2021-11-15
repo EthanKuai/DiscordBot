@@ -37,7 +37,8 @@ bot_cogs = {
 	'quote':QuoteCog(bot, web_bot),
 	'singapore':SingaporeCog(bot),
 	'twitter':TwitterCog(bot),
-	'timetable':TimetableCog(bot, db)
+	'timetable':TimetableCog(bot, db, web_bot),
+	'google':GoogleCog(bot, db, web_bot)
 }
 bot_cogs['daily'] = DailyCog(bot, db, bot_cogs['reddit'], bot_cogs['quote'], bot_cogs['wiki'])
 if __name__ == '__main__':

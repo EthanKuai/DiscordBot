@@ -27,7 +27,7 @@ class web_accessor:
 			s += n
 		return s
 
-	async def web_json(self, url: str, params = False):
+	async def web_json(self, url: str, *, params = False):
 		"""Reads & returns json of url [requests package]."""
 		headers = {'User-agent': self._random_str()} # random user-agent
 
