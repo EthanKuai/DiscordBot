@@ -7,7 +7,7 @@ import sys
 QUOTE_DAILY = {"today":-1, "daily":-1, "qotd":-1, "day":-1}
 
 class QuoteCog(commands.Cog):
-	"""Quotes"""
+	"""Quotes, via ZenQuotes."""
 
 	def __init__(self, bot: commands.bot, web_bot: web_accessor):
 		self.bot = bot
@@ -17,7 +17,7 @@ class QuoteCog(commands.Cog):
 
 	@commands.command(usage=USAGES['quote']['quote'], aliases=ALIASES['quote']['quote'])
 	async def quote(self, ctx, cnt: text_or_int(QUOTE_DAILY) = 1):
-		"""QOTD & random quotes to help you stay motivated! Powered by Zenquote."""
+		"""QOTD & random quotes to help you stay motivated! Powered by ZenQsuotes."""
 		out = await self.web_quote(cnt)
 		if cnt == -1: out = "**Quote of the day**: " + out
 		await p(ctx, out)

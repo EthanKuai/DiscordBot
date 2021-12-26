@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+import asyncio
 
 from bot import *
 
@@ -11,6 +12,7 @@ class TimetableCog(commands.Cog):
 		self.bot = bot
 		self.db = db
 		self.tt_message = "No timetable set! Use `.ttset`. Afterwards, you can also append your set-timetable with `.ttadd` for easy updating, and remove lines with `.ttremove`"
+		self.raw_emoji = '<:raw:923554453938896936>'
 
 
 	@commands.command(aliases=ALIASES['daily']['timetable'])
@@ -29,7 +31,26 @@ class TimetableCog(commands.Cog):
 					icon_url = ctx.author.avatar_url
 				)
 			)
-			await ctx.reply(embed = embed)
+
+			# send embed, add :raw: emoji reaction
+			msg = await ctx.reply(embed = embed)
+			await msg.add_reaction(self.raw_emoji)
+
+			# detect for user's reaction
+			def check(reaction, user):
+				return str(reaction)==self.raw_emoji and user.id==userid
+			try:
+				reaction = None
+				#reaction = await self.bot.wait_for_reaction([self.raw_emoji], msg)
+				reaction, user = await self.bot.wait_for('reaction_add', timeout=REACTION_TIMEOUT, check=check)
+			except asyncio.TimeoutError: # timeout
+				await msg.add_reaction(self.raw_emoji)
+			finally:
+				if reaction is not None:
+					# reacted, send new embed of raw .tt content
+					embed.description = "```md\n" + embed.description.replace("`","\`") + "```"
+					await msg.edit(embed=embed)
+				await msg.clear_reaction(self.raw_emoji)
 		else:
 			await ctx.reply(self.tt_message)
 
@@ -53,6 +74,9 @@ class TimetableCog(commands.Cog):
 		if userid in self.db.TIMETABLES:
 			img = get_img(ctx)
 			new_contents = self.db.TIMETABLES[userid] + '\n' + contents
+			if len(new_contents) > MAX_DESCRIPTION:
+				await ctx.message.add_reaction("❎")
+				await ctx.reply(f"Maximum character count of `.tt` cannot exceed {MAX_DESCRIPTION}! Delete existing lines with `.ttremove`, or reset entire message with `.ttset`")
 
 			out = self.db.add_timetable(userid, new_contents, updated_img = img)
 			if out: await ctx.message.add_reaction("✅")

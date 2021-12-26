@@ -35,7 +35,7 @@ class RedditCog(commands.Cog):
 		else:
 			cnt = 5
 
-		sr = '_'.join(arr)
+		sr = self.web_bot.clean_inputs_for_urls('_'.join(arr))
 		if len(sr) > 21 or re.search('(^\d)|(^_)',sr):
 			raise commands.BadArgument("Invalid subreddit name")
 
@@ -52,7 +52,7 @@ class RedditCog(commands.Cog):
 		else:
 			embeds = await self.web_reddit(link, indiv_posts = True, top = (sr == "top"))
 		paginator = BotEmbedPaginator(ctx, embeds)
-		await paginator.run()
+		await paginator.run(timeout = PAGINATOR_TIMEOUT)
 
 
 	@reddit_Command.error
@@ -88,13 +88,13 @@ class RedditCog(commands.Cog):
 				sr = i['data']['subreddit_name_prefixed']
 				# img, to append to imgs if valid
 				img = i['data'].get('url_overridden_by_dest','')
-				if len(img) > 4 and img[-4:] in IMG_TYPES: imgs.append(img)
+				if img.startswith("http"):
+					if img[-4:] in IMG_TYPES: imgs.append(img)
+					else: desc += '\n' + img
 				else: img = ""
 
 				# formatting indiv embed
 				if indiv_posts:
-					tmp = f'Score: {score} Comments: {comments} Author: {author}\n'
-					tmp += trim(i['data']['selftext'], MAX_LEN)
 					indiv_embeds.append(
 						discord.Embed(
 							title = title,
@@ -112,9 +112,11 @@ class RedditCog(commands.Cog):
 						.set_image(url=img)
 					)
 					if desc != '':
+						if img[-4:] in IMG_TYPES: tmp = trim(i['data']['selftext'], MAX_FIELD)
+						else: tmp = trim(i['data']['selftext'], MAX_FIELD-len(img)) + '\n' + img
 						indiv_embeds[-1].add_field(
 							name = "Description",
-							value = trim(i['data']['selftext'], MAX_FIELD),
+							value = tmp,
 							inline = False
 						)
 

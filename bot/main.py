@@ -7,28 +7,43 @@ from .cogs import *
 from .keep_alive import alive
 
 
-DESC = "Hi I am Pseudo, a personal discord bot. Currently in development."
-HELP_COMMAND = commands.DefaultHelpCommand(no_category = 'Others')
-
 # bot
+DESC = "Hi I am Pseudo, a personal discord bot. Currently in development."
+help_command = commands.DefaultHelpCommand(no_category = 'Others')
+
 intents = discord.Intents.default()
 intents.members = True
 intents.reactions = True
 intents.typing = False
 intents.presences = False
+
 bot = commands.Bot(
 	command_prefix = commands.when_mentioned_or('.'),
 	description = DESC,
 	intents = intents,
 	case_insensitive = True,
-	help_command = HELP_COMMAND
+	help_command = help_command
 )
 
-# utilities
+
+# bot commands
+@bot.event
+async def on_ready():
+	"""When bot is ready and connected to Discord"""
+	# discord.Game discord.Streaming discord.Activity(type=discord.ActivityType.listening/watching)
+	await bot.change_presence(activity=discord.Game(name='Type .help for help!', type=1))
+	print(f'{bot.user.name=}; {bot.user.id=}; {discord.__version__=}')
+
+@bot.command(aliases=ALIASES['hi'])
+async def hi(ctx):
+	"""Help Pseudo remain happy!"""
+	await p(ctx,DESC)
+
+
+# cogs
 db = db_accessor()
 web_bot = web_accessor()
 
-# cogs
 bot_cogs = {
 	'owner':OwnerCog(bot, db),
 	'utility':UtilityCog(bot),
@@ -38,13 +53,13 @@ bot_cogs = {
 	'singapore':SingaporeCog(bot),
 	'twitter':TwitterCog(bot),
 	'timetable':TimetableCog(bot, db, web_bot),
-	'google':GoogleCog(bot, db, web_bot)
+	'google':GoogleCog(bot, db, web_bot),
+	'dictionary':DictionaryCog(bot, db, web_bot)
 }
 bot_cogs['daily'] = DailyCog(bot, db, bot_cogs['reddit'], bot_cogs['quote'], bot_cogs['wiki'])
-if __name__ == '__main__':
-	for i in bot_cogs.values():
-		bot.add_cog(i)
 
+
+# logger
 # https://docs.python.org/3/library/logging.html#module-logging
 # https://docs.python.org/3/howto/logging.html#logging-basic-tutorial
 logger = logging.getLogger('discord')
@@ -53,20 +68,13 @@ handler = logging.FileHandler(filename='err.log', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-# When bot is ready
-@bot.event
-async def on_ready():
+
+# main script
+def main():
 	global bot
-	# discord.Game(name="", type=1, url="")
-	# discord.Streaming(name="", url="")
-	# discord.Activity(type=discord.ActivityType.listening/watching, name="")
-	await bot.change_presence(activity=discord.Game(name='Type .help for help!', type=1))
-	print(f'{bot.user.name=}; {bot.user.id=}; {discord.__version__=}')
+	for bot_cog in bot_cogs.values(): bot.add_cog(bot_cog)
+	alive()
+	bot.run(db.TOKEN, bot=True, reconnect=True)
 
-@bot.command(aliases=ALIASES['hi'])
-async def hi(ctx):
-	"""Help Pseudo remain happy!"""
-	await p(ctx,DESC)
-
-alive()
-bot.run(db.TOKEN, bot=True, reconnect=True)
+if __name__ == '__main__':
+	main()

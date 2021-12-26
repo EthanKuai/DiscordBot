@@ -14,35 +14,25 @@ class WikiCog(commands.Cog):
 		self.web_bot = web_bot
 		self.wiki_logo = "https://upload.wikimedia.org/wikipedia/commons/6/63/Wikipedia-logo.png"
 		self.section_regex = ' *=+[\dA-z, \(\)\-\+]+=+ *'
-		self.DEFAULT_LANG = 'en'
 		self.SUMMARY_LEN = 500
 		self.PAGES = 9
 		self.SEARCH_MAX = 36
 		self.SEARCH_PER_PAGE = 6
 
 
-	def _lang(self, s: str):
-		"""If accepted language, else uses default"""
-		if re.search('^[A-Z][A-Z\-]*[A-Z]$', s):
-			return s.lower() # accepted language
-		else:
-			return self.DEFAULT_LANG
-
-
 	@commands.command(usage=USAGES['wiki']['wiki'], aliases=ALIASES['wiki']['wiki'])
 	async def wiki(self, ctx, *, search: str):
 		"""Summary of Wikipedia page"""
 		search = search.replace('_', ' ')
-		lang = self._lang(search.split(' ')[-1])
 
 		# search closest wiki page
-		results = await self.web_wiki_search(search, lang)
+		results = await self.web_wiki_search(search)
 		page_title = results[0][0]
 		page_url = results[0][1]
 
-		embeds = await self.web_wiki(page_url, page_title = page_title, lang = lang)
+		embeds = await self.web_wiki(page_url, page_title = page_title)
 		paginator = BotEmbedPaginator(ctx, embeds)
-		await paginator.run(timeout = 400)
+		await paginator.run(timeout = PAGINATOR_TIMEOUT)
 
 
 	@wiki.error
@@ -54,9 +44,8 @@ class WikiCog(commands.Cog):
 	async def wikisearch(self, ctx, *, search: str):
 		"""Top Wikipedia search results"""
 		search = search.replace('_', ' ')
-		lang = self._lang(search.split(' ')[-1])
 
-		results = await self.web_wiki_search(search, lang)
+		results = await self.web_wiki_search(search)
 		results = results[:self.SEARCH_MAX]
 		embeds = []
 
@@ -64,7 +53,7 @@ class WikiCog(commands.Cog):
 			# description of each embed
 			desc = ""
 			for title, url in results[page:page + self.SEARCH_PER_PAGE]:
-				one_liner = await self.web_wiki_abstract(title, lang)
+				one_liner = await self.web_wiki_abstract(title)
 				desc += process_links(f'[**{trim(title)}**]({url} )') + '\n' + one_liner + '\n'
 
 			embeds.append(
@@ -76,7 +65,7 @@ class WikiCog(commands.Cog):
 				.set_author(name = "Wikipedia", icon_url = self.wiki_logo)
 			)
 		paginator = BotEmbedPaginator(ctx, embeds)
-		await paginator.run(timeout = 400)
+		await paginator.run(timeout = PAGINATOR_TIMEOUT)
 
 
 	@wikisearch.error
@@ -89,12 +78,12 @@ class WikiCog(commands.Cog):
 
 
 	# retrieve 1-liner description of page
-	async def web_wiki_abstract(self, page_title: str, lang: str):
-		api_url = f'https://{lang}.wikipedia.org/w/api.php'
+	async def web_wiki_abstract(self, page_title: str):
+		api_url = f'https://en.wikipedia.org/w/api.php'
 		params = {
 			"action": "query",
 			"format": "json",
-			"titles": page_title,
+			"titles": self.web_bot.clean_inputs_for_urls(page_title),
 			"prop": "pageprops"
 		}
 		try:
@@ -109,14 +98,14 @@ class WikiCog(commands.Cog):
 
 
 	# wiki search results
-	async def web_wiki_search(self, search: str, lang: str):
-		api_url = f'https://{lang}.wikipedia.org/w/api.php'
+	async def web_wiki_search(self, search: str):
+		api_url = f'https://en.wikipedia.org/w/api.php'
 		# get closest wiki page
 		search = search.replace("_", "%20").replace("&", "%20")
 		search_params = {
 			"action": "opensearch",
 			"format": "json",
-			"search": search
+			"search": self.web_bot.clean_inputs_for_urls(search)
 		}
 		search_json = await self.web_bot.web_json(api_url, params = search_params)
 		# (title, url)
@@ -125,18 +114,17 @@ class WikiCog(commands.Cog):
 
 
 	# mediawiki API: https://github.com/mudroljub/wikipedia-api-docs
-	async def web_wiki(self, page_url: str, page_title: str = None, lang: str = None, indiv_posts: bool = True):
-		if lang == None:
-			lang = page_url.split(".wikipedia.org/")[0][8:]
+	async def web_wiki(self, page_url: str, page_title: str = None, indiv_posts: bool = True):
 		if page_title == None:
 			page_title = ' '.join([s.capitalize() for s in page_url.split(".wikipedia.org/wiki/")[1].split("_")])
-		api_url = f'https://{lang}.wikipedia.org/w/api.php'
+		api_url = f'https://en.wikipedia.org/w/api.php'
+		page_title_cleaned = self.web_bot.clean_inputs_for_urls(page_title)
 
 		# retrieving page info
 		info_params = {
 			"action": "query",
 			"format": "json",
-			"titles": page_title, # "titles": "Category:Foo|Category:Infobox templates",
+			"titles": page_title_cleaned, # "titles": "Category:Foo|Category:Infobox templates",
 			"prop": "extracts", # "prop": "categoryinfo",
 			"explaintext": "", # no html formatting
 			"redirects": 1
@@ -152,7 +140,7 @@ class WikiCog(commands.Cog):
 		icon_params = {
 			"action": "query",
 			"format": "json",
-			"titles": page_title,
+			"titles": page_title_cleaned,
 			"prop": "pageimages",
 			"pithumbsize": "500"
 		}
@@ -165,7 +153,7 @@ class WikiCog(commands.Cog):
 		except: icon_url = ""
 
 		# retrieving 1-liner description
-		one_liner = await self.web_wiki_abstract(page_title, lang)
+		one_liner = await self.web_wiki_abstract(page_title)
 
 		# formatting first embed (summary)
 		embeds = [

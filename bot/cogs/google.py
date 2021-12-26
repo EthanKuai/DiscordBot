@@ -3,6 +3,8 @@ from discord.ext import commands
 
 from bot import *
 from disputils import BotEmbedPaginator
+from googletrans import Translator
+# python -m pip install googletrans==4.0.0-rc1
 
 
 class GoogleCog(commands.Cog):
@@ -12,7 +14,9 @@ class GoogleCog(commands.Cog):
 		self.bot = bot
 		self.db = db
 		self.web_bot = web_bot
+		self.translator = Translator(service_urls=['translate.googleapis.com'])
 		self.google_logo = "https://www.pngall.com/wp-content/uploads/5/Google-G-Logo-PNG-Image.png"
+		self.translate_logo = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Google_Translate_logo.svg/1024px-Google_Translate_logo.svg.png"
 		self.url = "https://www.googleapis.com/customsearch/v1"
 		self.MAX_SEARCH = 5
 
@@ -22,7 +26,7 @@ class GoogleCog(commands.Cog):
 		"""Google Search. Please use sparringly."""
 		embeds = await self.web_google(search)
 		paginator = BotEmbedPaginator(ctx, embeds)
-		await paginator.run()
+		await paginator.run(timeout = PAGINATOR_TIMEOUT)
 
 
 	@google.error
@@ -37,7 +41,7 @@ class GoogleCog(commands.Cog):
 			params = {
 				"key": self.db.GOOGLE_API_KEY,
 				"cx": self.db.GOOGLE_API_ID,
-				"q": search.replace("_", "%20").replace("&", "%20"),
+				"q": self.web_bot.clean_inputs_for_urls(search),
 				"start": 1, # pg=-2, start=11; page=3, start=21
 				"num": self.MAX_SEARCH
 			}
@@ -48,8 +52,9 @@ class GoogleCog(commands.Cog):
 				title = trim(entry["title"])
 				link = process_links(entry["link"])
 				displayLink = trim(entry["displayLink"])
-				snippet = trim(entry["snippet"])
+				snippet = trim(entry["snippet"], MAX_FIELD-len(displayLink))
 				img = entry.get("pagemap", {}).get("cse_image", [{"src":""}])[0]["src"]
+				if not img.startswith("http"): img = ""
 
 				embeds += [
 					discord.Embed(
@@ -65,6 +70,31 @@ class GoogleCog(commands.Cog):
 
 		except Exception as e:
 			print(f"web_google exception {search=}\n{e=}\n{embeds=}")
+
+
+	@commands.command(usage=USAGES['google']['googletranslate'], aliases=ALIASES['google']['googletranslate'])
+	async def googletranslate(self, ctx, lang: regex(reg="[A-z\-]+"), *, untranslated: str):
+		"""Google translates from (auto-detect language) to specified language"""
+		if lang.lower() in ["ch","cn","zhcn","zh-cn"]: lang = "zh-CN"
+		elif lang.lower() in ["zh","tw","zhtw","zh-tw"]: lang = "zh-TW"
+		translated = self.translator.translate(untranslated, dest = lang)
+
+		embed = [
+			discord.Embed(
+				title = "Google Translate",
+				url = f"https://translate.google.com.sg/?sl=auto&tl={lang}&text={self.web_bot.clean_inputs_for_urls(untranslated)}&op=translate",
+				color = discord.Color.green()
+			)
+			.set_author(name = "Google Translate", icon_url = self.translate_logo)
+			.add_field(name = "Untranslated", value = untranslated[:MAX_FIELD], inline = True)
+			.add_field(name = "Translated", value = translated[:MAX_FIELD], inline = True)
+		]
+		await p(ctx, embed)
+
+
+	@googletranslate.error
+	async def googletranslate_error(self, ctx, error):
+		await badarguments(ctx, 'google', 'googletranslate')
 
 
 """

@@ -41,4 +41,5 @@ List found in [requirements.txt](https://github.com/EthanKuai/DiscordBot/blob/ma
 	git clone https://github.com/EthanKuai/DiscordBot.git
 	cd DiscordBot
 	python -m pip install --upgrade pip
- 	if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+	python -m pip install googletrans==4.0.0-rc1
+ 	if [ -f requirements.txt ]; then python -m pip install -r requirements.txt; fi

@@ -8,9 +8,12 @@ with open('bot/data/usages.json') as f: USAGES = json.load(f)
 with open('bot/data/aliases.json') as f: ALIASES = json.load(f)
 
 MAX_LEN = 1900 # discord message max length
-MAX_FIELD = 1000 # discord embed field max length
+MAX_DESCRIPTION = 4000 # discord embed description max length
+MAX_FIELD = 925 # discord embed field max length
 MAX_PARA = 165 # paragraph max len
-IMG_TYPES = [".png", ".jpg", ".jpeg", ".svg", ".mp4", ".gif", ".webp"] # media discord supports
+IMG_TYPES = [".png", ".jpg", ".jpeg", ".gif", ".webp"] # media discord supports
+PAGINATOR_TIMEOUT = 150 # seconds timeout for paginator before it stops accepting responses
+REACTION_TIMEOUT = 45
 
 # for .trim()
 _TRIM = [("*",""),("`",""),(">>> ",""),("%20"," "),("_"," "),("   "," "),("  "," "),("&amp;",""),("&amp","&"),("&gt;","")]
@@ -109,11 +112,9 @@ def trim(string: str, maxlen: int = MAX_PARA):
 
 
 def get_img(ctx, *, default: str = None):
-	"""Gets image url from ctx, if any"""
+	"""Gets image url from ctx, if any [last one if multiple images]"""
 	img = default
-	if len(ctx.message.attachments) > 0:
-		attachment = ctx.message.attachments[0]
+	for attachment in ctx.message.attachments:
 		if "." + attachment.filename.split(".")[-1] in IMG_TYPES and attachment.url.startswith("http"):
 			img = attachment.url
 	return img
-

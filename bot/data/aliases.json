@@ -24,6 +24,11 @@
 	},
 	"google": {
 		"google": ["g","googlesearch","google_search"],
-		"googleimage": ["gimage","google_image","googlei"]
+		"googleimage": ["gimage","google_image","googlei"],
+		"googletranslate": ["gtranslate","google_translate","translate"]
+	},
+	"dictionary": {
+		"dictionary": ["dict","dct","meaning"],
+		"thesaurus": ["thes"]
 	}
 }

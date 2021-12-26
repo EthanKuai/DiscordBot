@@ -11,6 +11,8 @@ class TemplateCog(commands.Cog):
 	def __init__(self, bot: commands.bot):
 		self.bot = bot
 
+
 	@commands.command()
 	async def command(self, ctx):
+		"""Description"""
 		await p(ctx, "hello world")

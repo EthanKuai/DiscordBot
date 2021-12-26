@@ -69,7 +69,7 @@ class DailyCog(commands.Cog):
 					out += await self._database_get_links(indiv_posts = True)
 					await p(ctx, out[:2])
 					paginator = BotEmbedPaginator(ctx, out[2:])
-					await paginator.run(timeout = 400)
+					await paginator.run(timeout = PAGINATOR_TIMEOUT)
 		except Exception as error:
 			if ctx != None: await p(ctx, "Daily briefing has run into an error!")
 			owner = await self.bot.application_info().owner
