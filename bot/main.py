@@ -46,7 +46,7 @@ web_bot = web_accessor()
 
 bot_cogs = {
 	'owner':OwnerCog(bot, db),
-	'utility':UtilityCog(bot),
+	'utility':UtilityCog(bot, db),
 	'reddit':RedditCog(bot, web_bot),
 	'wiki':WikiCog(bot, web_bot),
 	'quote':QuoteCog(bot, web_bot),

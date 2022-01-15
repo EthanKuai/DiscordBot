@@ -46,11 +46,12 @@ class TimetableCog(commands.Cog):
 			except asyncio.TimeoutError: # timeout
 				await msg.add_reaction(self.raw_emoji)
 			finally:
-				if reaction is not None:
-					# reacted, send new embed of raw .tt content
-					embed.description = "```md\n" + embed.description.replace("`","\`") + "```"
-					await msg.edit(embed=embed)
 				await msg.clear_reaction(self.raw_emoji)
+				if reaction is not None:
+					# user reacted with :raw:, send new embed of raw .tt content
+					embed.description = "```md\n" + embed.description.replace("`","\u200b`\u200b")[:MAX_DESCRIPTION] + "```"
+					embed.title = "Timetable [Raw]"
+					await msg.edit(embed=embed)
 		else:
 			await ctx.reply(self.tt_message)
 

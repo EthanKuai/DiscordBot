@@ -7,13 +7,15 @@ import typing
 import random
 from numpy.random import normal
 from math import sqrt
+from datetime import datetime as dt
 
 
 class UtilityCog(commands.Cog):
 	"""Utility"""
 
-	def __init__(self, bot: commands.bot):
+	def __init__(self, bot: commands.bot, db: db_accessor):
 		self.bot = bot
+		self.db = db
 
 
 	@commands.command(usage=USAGES['utility']['echo'])
@@ -99,4 +101,20 @@ class UtilityCog(commands.Cog):
 			description = desc[:-2],
 			colour = discord.Colour.gold()
 		)
+		await p(ctx, out)
+
+
+	@commands.command(aliases=ALIASES['utility']['day'])
+	async def day(self, ctx):
+		"""Day of the year."""
+		now = dt.now(tz=self.db.tz)
+		s = now.strftime("%A, %d %B %Y, at %H:%M:%S") # Saturday, 1 January 2022, at 20:12:13
+
+		day = now.timetuple().tm_yday # day of year
+
+		year = now.year
+		_ = (year % 400 == 0 and year % 100 == 0) or (year % 4 == 0 and year % 100 != 0) # leapyear
+		pcg = ( 1- day/(364+_) ) * 100 # % left of year
+
+		out = f"It is currently {s} (Timezone {self.db.tz})\n It is **Day {day}** of the year, with **{pcg:.2f}%** of the year left to go. 💪💪"
 		await p(ctx, out)

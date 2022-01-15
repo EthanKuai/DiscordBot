@@ -16,7 +16,8 @@
 	},
 	"utility": {
 		"coin": ["2","binary"],
-		"rng": ["random","dice","roll"]
+		"rng": ["random","dice","roll"],
+		"day": ["time","now"]
 	},
 	"wiki": {
 		"wiki": ["w","wikipedia","encyclopedia"],
