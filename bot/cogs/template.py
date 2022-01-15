@@ -2,14 +2,17 @@ import discord
 from discord.ext import commands
 
 from bot import *
-import sys
+from disputils import BotEmbedPaginator
 
 
 class TemplateCog(commands.Cog):
+	"""Description"""
+
 	def __init__(self, bot: commands.bot):
 		self.bot = bot
-		print(sys.argv[0] + ' being loaded!')
+
 
 	@commands.command()
 	async def command(self, ctx):
+		"""Description"""
 		await p(ctx, "hello world")

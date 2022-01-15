@@ -2,20 +2,28 @@ from discord.ext import commands
 import re
 
 class text_or_int(commands.Converter):
+	"""Accepts some words, and can accept integers as well."""
+
 	def __init__(self, text: dict, accept_int: bool = True):
 		self.text = text # dict of accepted text
 		self.accept_int = accept_int
 
 	async def convert(self, ctx, arg):
-		arg = arg.lower()
-		if self.accept_int and arg.isnumeric():
-			return int(arg)
-		if arg in self.text:
-			return self.text[arg]
+		if self.accept_int:
+			if arg.isnumeric():
+				return int(arg)
+			elif arg[0]=='-' and arg[1:].isnumeric():
+				return int(arg)
+		if arg.lower() in self.text:
+			return self.text[arg.lower()]
+		elif arg.upper() in self.text:
+			return self.text[arg.upper()]
 		else: raise commands.BadArgument(f'Neither integer nor recognised text: <{arg}>')
 
 
 class regex(commands.Converter):
+	"""Accepts arguments within a max length, passing regex and failing antiregex"""
+
 	def __init__(self, antireg: str = "", reg: str = "", maxlen: int = 2000):
 		self.reg = reg
 		self.antireg = antireg

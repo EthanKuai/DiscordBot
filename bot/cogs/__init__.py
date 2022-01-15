@@ -7,3 +7,7 @@ from .quote import *
 from .utility import *
 from .gnews import *
 from .singapore import *
+from .twitter import *
+from .timetable import *
+from .google import *
+from .dictionary import *

@@ -1,7 +1,12 @@
 {
 	"hi": ["hello","bonjour","ohayou","halo","nihao"],
 	"daily": {
-		"daily": ["dailybriefing"]
+		"daily_command": ["dailybriefing"],
+		"timetable": ["schedule","tt"],
+		"timetableset": ["timetable_set","scheduleset","schedule_set","ttset","tt_set"],
+		"timetableadd": ["timetable_add","scheduleadd","schedule_add","ttadd","tt_add"],
+		"timetableremove": ["timetable_remove","scheduleremove","schedule_remove","ttremove","tt_remove","timetable_delete","scheduledelete","schedule_delete","ttdelete","tt_delete"],
+		"dt_timezone": ["tz","zone"]
 	},
 	"quote": {
 		"quote": ["saying","inspire","inspiration"]
@@ -11,10 +16,20 @@
 	},
 	"utility": {
 		"coin": ["2","binary"],
-		"rng": ["random","dice","roll"]
+		"rng": ["random","dice","roll"],
+		"day": ["time","now"]
 	},
 	"wiki": {
 		"wiki": ["w","wikipedia","encyclopedia"],
 		"wikisearch": ["ws","wsearch","wikipediasearch","encyclopediasearch"]
+	},
+	"google": {
+		"google": ["g","googlesearch","google_search"],
+		"googleimage": ["gimage","google_image","googlei"],
+		"googletranslate": ["gtranslate","google_translate","translate"]
+	},
+	"dictionary": {
+		"dictionary": ["dict","dct","meaning"],
+		"thesaurus": ["thes"]
 	}
 }

@@ -6,7 +6,7 @@ My personal discord bot to suit my needs. Used in my personal Discord server.
 
 Convenience. Access multiple sites and rng in the comfort of Discord, with 100% privacy.
 
-# Features
+## Features
 
 - [x] says *hello!*
 - [x] reads from [reddit](https://www.reddit.com/), [zenquote](https://zenquotes.io/), [wikipedia](https://en.wikipedia.org/) *and more in the future...*
@@ -23,7 +23,7 @@ Convenience. Access multiple sites and rng in the comfort of Discord, with 100% 
 - [ ] API connections & pings/updates from *twitter, gnews, merriam webster, etc.*
 - [ ] calculator
 
-# Dependencies
+## Dependencies
 
 List found in [requirements.txt](https://github.com/EthanKuai/DiscordBot/blob/main/requirements.txt)
 + [Python 3.8](https://www.python.org/downloads/release/python-383/)
@@ -41,4 +41,5 @@ List found in [requirements.txt](https://github.com/EthanKuai/DiscordBot/blob/ma
 	git clone https://github.com/EthanKuai/DiscordBot.git
 	cd DiscordBot
 	python -m pip install --upgrade pip
- 	if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+	python -m pip install googletrans==4.0.0-rc1
+ 	if [ -f requirements.txt ]; then python -m pip install -r requirements.txt; fi

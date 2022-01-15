@@ -3,7 +3,7 @@
 		"quote": "[\"qotd\"/number=1]"
 	},
 	"reddit": {
-		"reddit": "<subreddit/\"top\"> [posts=5] [sortby=\"day\"/\"now\"/\"hour\"/\"week\"/\"month\"/\"year\"/\"all\"]"
+		"reddit": "<subreddit/\"top\"/\"reddit\"/\"main\"> [posts=5] [sortby=\"day\"/\"now\"/\"hour\"/\"week\"/\"month\"/\"year\"/\"all\"/\"new\"]"
 	},
 	"utility": {
 		"echo": "[number of messages=1-5] <message content>",
@@ -12,6 +12,21 @@
 		"ping": "[decimal place precision=3]"
 	},
 	"wiki": {
-		"wiki": "<page> [\"full\"]"
+		"wiki": "<page>",
+		"wikisearch": "<search term>"
+	},
+	"daily": {
+		"dl_add": "<link>",
+		"dl_remove": "<link>",
+		"dt_shift": "<no. hours to shift>",
+		"dt_timezone": "<timezone code/UTC offset>"
+	},
+	"google": {
+		"google": "<search term>",
+		"googletranslate": "<lang> <untranslated text>"
+	},
+	"dictionary": {
+		"dictionary": "<search term>",
+		"thesaurus": "<search term>"
 	}
 }
