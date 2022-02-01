@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import asyncio
+import typing
 
 from bot import *
 
@@ -11,12 +12,13 @@ class TimetableCog(commands.Cog):
 	def __init__(self, bot: commands.bot, db: db_accessor):
 		self.bot = bot
 		self.db = db
-		self.tt_message = "No timetable set! Use `.ttset`. Afterwards, you can also append your set-timetable with `.ttadd` for easy updating, and remove lines with `.ttremove`"
+		self.tt_reminder = "To reset your timetable, use `.ttset`. Afterwards, you can also append your existing timetable with `.ttadd` for easy updating, and remove lines with `.ttremove`!"
+		self.tt_unset = "No timetable set!" + self.tt_reminder
 		self.raw_emoji = '<:raw:923554453938896936>'
 
 
 	@commands.command(aliases=ALIASES['daily']['timetable'])
-	async def timetable(self, ctx):
+	async def timetable(self, ctx, others: typing.Optional[str] = None):
 		"""Sends timetable message uniquely set by each user."""
 		userid = ctx.message.author.id
 		if userid in self.db.TIMETABLES:
@@ -33,7 +35,8 @@ class TimetableCog(commands.Cog):
 			)
 
 			# send embed, add :raw: emoji reaction
-			msg = await ctx.reply(embed = embed)
+			if others is None: msg = await ctx.reply(embed = embed)
+			else: msg = await ctx.reply(self.tt_reminder, embed = embed)
 			await msg.add_reaction(self.raw_emoji)
 
 			# detect for user's reaction
@@ -42,7 +45,7 @@ class TimetableCog(commands.Cog):
 			try:
 				reaction = None
 				#reaction = await self.bot.wait_for_reaction([self.raw_emoji], msg)
-				reaction, user = await self.bot.wait_for('reaction_add', timeout=REACTION_TIMEOUT, check=check)
+				reaction, _ = await self.bot.wait_for('reaction_add', timeout=REACTION_TIMEOUT, check=check)
 			except asyncio.TimeoutError: # timeout
 				await msg.add_reaction(self.raw_emoji)
 			finally:
@@ -53,7 +56,7 @@ class TimetableCog(commands.Cog):
 					embed.title = "Timetable [Raw]"
 					await msg.edit(embed=embed)
 		else:
-			await ctx.reply(self.tt_message)
+			await ctx.reply(self.tt_unset)
 
 
 	@commands.command(aliases=ALIASES['daily']['timetableset'])
@@ -78,12 +81,13 @@ class TimetableCog(commands.Cog):
 			if len(new_contents) > MAX_DESCRIPTION:
 				await ctx.message.add_reaction("❎")
 				await ctx.reply(f"Maximum character count of `.tt` cannot exceed {MAX_DESCRIPTION}! Delete existing lines with `.ttremove`, or reset entire message with `.ttset`")
+				return None
 
 			out = self.db.add_timetable(userid, new_contents, updated_img = img)
 			if out: await ctx.message.add_reaction("✅")
 			else: await ctx.message.add_reaction("❎")
 		else:
-			await ctx.reply(self.tt_message)
+			await ctx.reply(self.tt_unset)
 
 
 	@commands.command(aliases=ALIASES['daily']['timetableremove'])
@@ -111,4 +115,4 @@ class TimetableCog(commands.Cog):
 						await ctx.reply(msg)
 				else: await ctx.message.add_reaction("❎")
 		else:
-			await ctx.reply(self.tt_message)
+			await ctx.reply(self.tt_unset)

@@ -63,7 +63,9 @@ def closestMatch(s: str, lst_in: list, /, splitby: str = ' '):
 
 	for phrase in range(len(lst)):
 		for word in lst[phrase]:
-			if re.search(word, s):
+			if word==s:
+				score[phrase] += 2
+			elif re.search(s, word):
 				score[phrase] += 1
 		if score[phrase] > score[maxindex]:
 			maxindex = phrase

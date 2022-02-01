@@ -3,8 +3,8 @@ from discord import colour
 from discord.ext import commands
 
 from bot import *
-import sys
 import re
+from disputils import BotEmbedPaginator
 
 
 class SingaporeCog(commands.Cog):
@@ -23,47 +23,34 @@ class SingaporeCog(commands.Cog):
 	@mrt.command()
 	async def map(self, ctx):
 		"""Singapore MRT Map."""
-		await p(ctx, self.mrt_map)
+		embed = discord.Embed(title = "MRT Map")
+		embed.add_field(name="MRT Lines",value='\n'.join(self.mrt_lines))
+		embed.set_image(url=self.mrt_map)
+		embed.set_footer(text="Use .mrt stations to list all stations")
+		await p(ctx, embed)
 
 
 	@mrt.command()
 	async def line(self, ctx, *, inn: str):
 		"""Search for Singapore MRT line."""
-		i, line = closestMatch(inn, self.mrt_lines)
-		embed = discord.Embed(title = line, color = self.mrt_colors[i])
-		embed.description = '\n'.join(self.mrt_stations[i])
-		await p(ctx, embed)
-
-
-	@mrt.command()
-	async def lines(self, ctx):
-		"""List of Singapore MRT lines."""
-		embed = discord.Embed(title = "All MRT Stations")
-		embed.description = '\n'.join(self.mrt_lines)
-		await p(ctx, embed)
+		i, _ = closestMatch(inn, self.mrt_lines)
+		await p(ctx, self.mrt_line_embeds[i])
 
 
 	@mrt.command()
 	async def station(self, ctx, *, inn: str):
 		"""Search for Singapore MRT station."""
-		stations = []
-		for x in self.mrt_stations:
-			for i in x:
-				stations += [i.replace('*','')]
-		i, station = closestMatch(inn, stations)
+		_, station = closestMatch(inn, self.mrt_station_search)
 		embed = discord.Embed(title = station)
+		embed.set_footer(text="Use .mrt map to view MRT map")
 		await p(ctx, embed)
 
 
 	@mrt.command()
 	async def stations(self, ctx):
 		"""List of Singapore MRT stations."""
-		stations = []
-		for x in self.mrt_stations:
-			stations += x
-		embed = discord.Embed(title = "All MRT Stations")
-		embed.description = '\n'.join(stations)
-		await p(ctx, embed)
+		paginator = BotEmbedPaginator(ctx, self.mrt_line_embeds)
+		await paginator.run(timeout = PAGINATOR_TIMEOUT)
 
 
 	def mrt_initialise(self):
@@ -82,3 +69,15 @@ class SingaporeCog(commands.Cog):
 					fullnames += f'**``{codes[i]}``** {names[i]}'
 					if names[i] != "": fullnames += '\n'
 				self.mrt_stations += [fullnames.split('\n')[:-1]]
+
+		self.mrt_line_embeds = [
+			discord.Embed(
+				title = line,
+				color = self.mrt_colors[i],
+				description = '\n'.join(self.mrt_stations[i])
+			).set_footer(text="Use .mrt station to a find specific station")
+			for i, line in enumerate(self.mrt_lines)
+		] # for .mrt stations, .mrt lines
+
+		self.mrt_station_search = []
+		for i in self.mrt_stations: self.mrt_station_search += i

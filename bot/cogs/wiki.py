@@ -134,7 +134,7 @@ class WikiCog(commands.Cog):
 		# info_json.keys() has 1 item, being the pageid
 		for i in info_json.keys(): info_json = info_json[i]
 		summary = trim(info_json['extract'], self.SUMMARY_LEN) # article summary
-		if indiv_posts: page_info = trim(info_json['extract'], MAX_LEN * self.PAGES) # 'full' article
+		if indiv_posts: page_info = trim(info_json['extract'], MAX_DESCRIPTION * self.PAGES) # 'full' article
 
 		# retrieving main image
 		icon_params = {
@@ -173,11 +173,11 @@ class WikiCog(commands.Cog):
 			sects = [""] + re.findall(self.section_regex, page_info)
 			lst = [""]
 			for para, sect in zip(paras, sects):
-				end = min(MAX_LEN - len(lst[-1]), 0) # solve edge-case problem where char change from renaming section headers cause -ve end values and thus blank pages
+				end = min(MAX_DESCRIPTION - len(lst[-1]), 0) # solve edge-case problem where char change from renaming section headers cause -ve end values and thus blank pages
 				lst[-1] += re.sub(" *=+ *","**\n", sect)
 				lst[-1] += para[:end]
 				if end <= len(para):
-					lst += [para[i:MAX_LEN+i] for i in range(end, len(para), MAX_LEN)]
+					lst += [para[i:MAX_DESCRIPTION+i] for i in range(end, len(para), MAX_DESCRIPTION)]
 
 			# add other embeds (full wiki page)
 			embeds += [
