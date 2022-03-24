@@ -2,6 +2,7 @@
 import discord
 import json
 import re
+import Levenshtein as lev
 
 
 with open('bot/data/usages.json') as f: USAGES = json.load(f)
@@ -52,24 +53,32 @@ async def p(ctx, messages, splitby: str = "\n"):
 				await ctx.send(line[i: i + MAX_LEN])
 
 
-def closestMatch(s: str, lst_in: list, /, splitby: str = ' '):
-	"""Finds closest item in list to string, uses splitby to split each phrase in list into words."""
-	lst = []
-	for i in lst_in: lst += [i.lower().split(splitby)]
-	s = s.lower().strip()
+def closestMatchesIndexes(s: str, lst: list, tol: float = 0.5):
+	"""Finds closest few in list to s, returns list of indexes."""
+	s = s.strip().lower()
+	scores = []
+	for i, phrase in enumerate(lst):
+		phrase = phrase.lower()
+		if s in phrase:
+			scores.append((1, i))
+		elif (dist := lev.distance(s, phrase)) < len(phrase)*tol: # sufficiently close
+			scores.append((1-dist/len(phrase), i))
+	scores.sort(key = lambda i: i[0], reverse = True)
+	return [i[1] for i in scores]
 
-	score = [0 for _ in lst]
-	maxindex = 0 # index of maximum scorer
 
-	for phrase in range(len(lst)):
-		for word in lst[phrase]:
-			if word==s:
-				score[phrase] += 2
-			elif re.search(s, word):
-				score[phrase] += 1
-		if score[phrase] > score[maxindex]:
-			maxindex = phrase
-	return maxindex, splitby.join(lst[maxindex])
+def closestMatches(s: str, lst: list, tol: float = 0.5):
+	"""Finds closest few in list to s, returns list of items."""
+	s = s.strip().lower()
+	scores = []
+	for phrase in lst:
+		phrase = phrase.lower()
+		if s in phrase:
+			scores.append((1, phrase))
+		elif (dist := lev.distance(s, phrase)) < len(phrase)*tol: # sufficiently close
+			scores.append((1-dist/len(phrase), phrase))
+	scores.sort(key = lambda i: i[0], reverse = True)
+	return [i[1] for i in scores]
 
 
 def process_nolinks(s: str):

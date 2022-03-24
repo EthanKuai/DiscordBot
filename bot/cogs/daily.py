@@ -66,7 +66,7 @@ class DailyCog(commands.Cog):
 					await p(ctx, out)
 				else:
 					# message-triggered
-					out += await self._database_get_links(indiv_posts = True)
+					out += await self._database_get_links()
 					await p(ctx, out[:2])
 					paginator = BotEmbedPaginator(ctx, out[2:])
 					await paginator.run(timeout = PAGINATOR_TIMEOUT)
